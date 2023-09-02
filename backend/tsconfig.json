@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "commonjs",
+    "target": "es6",
+    "removeComments": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "isolatedModules": false,
+    "allowSyntheticDefaultImports": true,
+    "allowUmdGlobalAccess": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["node", "jest"],
+    "lib": ["es6"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
+  "exclude": ["node_modules"]
+}

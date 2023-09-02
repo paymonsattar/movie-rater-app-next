@@ -3,6 +3,3 @@ export const isValidEmail = (email: string): boolean => {
   return re.test(email);
 };
 
-export const isValidDate = (date: string): boolean => {
-  return !isNaN(Date.parse(date));
-};

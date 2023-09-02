@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import winston from 'winston';
 
-const logger = winston.createLogger({
+console.log('winston', winston)
+
+export const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   defaultMeta: { service: 'user-service' },
@@ -25,6 +27,10 @@ if (process.env.NODE_ENV !== 'production') {
 export const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   // 👇️ Log the request
   logger.info(`Request: ${req.method} ${req.path}, Headers: ${JSON.stringify(req.headers)}, Body: ${JSON.stringify(req.body)}, Query: ${JSON.stringify(req.query)}`);
+  
+  if (res.locals && res.locals.errorMessage) {
+    logger.error(`Error: ${res.locals.errorMessage}`);
+  }
 
   // 👇️ Log the response
   res.on('finish', () => {

@@ -9,7 +9,7 @@ export const formatDate = (date: Date, format: string = 'YYYY-MM-DD'): string =>
 // 👇️ Used to parse a date string into a Date object.
 // Useful for converting client-provided date strings into Date objects that can be used in the application.
 export const parseDate = (dateString: string, format: string = 'YYYY-MM-DD'): Date => {
-  return moment(dateString, format).toDate();
+  return moment.utc(dateString, format).toDate();
 };
 
 // 👇️ Used to calculate the difference between two dates in days.
