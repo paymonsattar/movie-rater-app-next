@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { RedisClient } from '../types';
 
 export const addReview = (client: RedisClient) => async (req: Request, res: Response) => {
-  const { movieId, review } = req.body;
+  const { id, review } = req.body;
   try {
-    const reply = await client.RPUSH(`reviews:${movieId}`, review.toString());
+    const reply = await client.RPUSH(`reviews:${id}`, review.toString());
 
     return res.status(201).json({ message: 'Review added', count: reply }); 
   } catch (error) {
@@ -13,10 +13,10 @@ export const addReview = (client: RedisClient) => async (req: Request, res: Resp
 };
 
 export const getReviews = (client: RedisClient) => async (req: Request, res: Response) => {
-  const { movieId } = req.params;
+  const { id } = req.params;
 
   try {
-    const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
+    const reply = await client.LRANGE(`reviews:${id}`, 0, -1);
 
     return res.status(200).json({ reviews: reply });
   } catch (error) {
@@ -25,10 +25,10 @@ export const getReviews = (client: RedisClient) => async (req: Request, res: Res
 };
 
 export const getReviewAverage = (client: RedisClient) => async (req: Request, res: Response) => {
-  const { movieId } = req.params;
+  const { id } = req.params;
 
   try {
-    const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
+    const reply = await client.LRANGE(`reviews:${id}`, 0, -1);
     const reviews = reply.map(Number);
 
     const total = reviews.reduce((acc, val) => acc + val, 0);

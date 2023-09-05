@@ -15,7 +15,7 @@ const initialise = async () => {
   const port = 3000;
 
   app.use(express.json());
-  app.use('/', createMovieReviewRoutes(client));
+  app.use('/reviews/', createMovieReviewRoutes(client));
 
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
