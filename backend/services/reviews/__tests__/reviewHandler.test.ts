@@ -22,7 +22,7 @@ const mockRequest = (body: object, params: object): Request => {
   } as Request;
 };
 
-describe('Review Operations', () => {
+describe('Movie Review API handlers tests', () => {
   let req: Request;
   let res: jest.Mocked<Response>;
   let mockRedisClient: ReturnType<typeof redis.createClient>;
