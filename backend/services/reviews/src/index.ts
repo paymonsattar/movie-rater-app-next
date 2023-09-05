@@ -1,6 +1,6 @@
 import express from 'express';
 import { createClient } from 'redis';
-import { createMovieReviewRoutes } from './routes/reviews';
+import { createMovieReviewRoutes } from './routes/review';
 
 const client = createClient();
 
