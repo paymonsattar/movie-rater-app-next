@@ -5,7 +5,7 @@ import {
   diffInDays,
   addDays,
   isValidDate,
-  toUnixTimestamp
+  toUnixTimestamp,
 } from '../../src/index'; // Replace the import path with the actual path to your data.ts file
 
 describe('formatDate', () => {

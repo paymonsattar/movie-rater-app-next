@@ -1,26 +1,35 @@
+import { Response } from 'express';
+
 type ResponseData = Record<string, any> | Array<any> | null;
 
+// Define the interface for the response object
+export interface IResponse {
+  status: string;
+  code: number;
+  body?: any;
+  message?: string;
+}
+
 // 👇️ Used for successful GET requests to return requested data.
-export const okResponse = (data: ResponseData) => {
+export const OK_RESPONSE = (data: ResponseData): IResponse => {
   return {
     status: 'success',
     code: 200,
-    data,
+    body: data,
   };
 };
 
 // 👇️ Used for successful POST requests that create a new resource.
-// The newly created resource can be returned in the data field.
-export const createdResponse = (data: ResponseData) => {
+export const CREATED_RESPONSE = (data: ResponseData): IResponse => {
   return {
     status: 'success',
     code: 201,
-    data,
+    body: data,
   };
 };
 
 // 👇️ Used for successful DELETE requests or any other request that has been processed but doesn't return data.
-export const noContentResponse = () => {
+export const NO_CONTENT_RESPONSE = (): IResponse => {
   return {
     status: 'success',
     code: 204,
@@ -28,7 +37,7 @@ export const noContentResponse = () => {
 };
 
 // 👇️ Used when the client sends a request with invalid fields.
-export const badRequestResponse = (message: string) => {
+export const BAD_REQUEST_RESPONSE = (message: string): IResponse => {
   return {
     status: 'error',
     code: 400,
@@ -37,7 +46,7 @@ export const badRequestResponse = (message: string) => {
 };
 
 // 👇️ Used when authentication is required and the request lacks valid credentials.
-export const unauthorizedResponse = (message: string) => {
+export const UNAUTHORIZED_RESPONSE = (message: string): IResponse => {
   return {
     status: 'error',
     code: 401,
@@ -46,7 +55,7 @@ export const unauthorizedResponse = (message: string) => {
 };
 
 // 👇️ Used when the authenticated user doesn't have permissions to access a resource.
-export const forbiddenResponse = (message: string) => {
+export const FORBIDDEN_RESPONSE = (message: string): IResponse => {
   return {
     status: 'error',
     code: 403,
@@ -55,7 +64,7 @@ export const forbiddenResponse = (message: string) => {
 };
 
 // 👇️ Used when the requested resource could not be found.
-export const notFoundResponse = (message: string) => {
+export const NOT_FOUND_RESPONSE = (message: string): IResponse => {
   return {
     status: 'error',
     code: 404,
@@ -64,7 +73,7 @@ export const notFoundResponse = (message: string) => {
 };
 
 // 👇️ Used for unexpected server errors.
-export const internalServerErrorResponse = (message: string) => {
+export const INTERNAL_SERVER_ERROR_RESPONSE = (message: string): IResponse => {
   return {
     status: 'error',
     code: 500,
@@ -73,7 +82,7 @@ export const internalServerErrorResponse = (message: string) => {
 };
 
 // 👇️ Used for service unavailable errors, often useful for maintenance windows or rate limiting.
-export const serviceUnavailableResponse = (message: string) => {
+export const SERVICE_UNAVAILABLE_RESPONSE = (message: string): IResponse => {
   return {
     status: 'error',
     code: 503,

@@ -30,7 +30,7 @@
       "./node_modules/@types"
     ],
     "paths": {
-      "backend/common": [
+      "@movie-rater/backend-common": [
         "packages/backend/common/src/index.ts"
       ]
     }

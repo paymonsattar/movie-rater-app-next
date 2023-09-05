@@ -4,7 +4,7 @@ import { createMovieRoutes } from './routes/movie';
 
 const client = createClient();
 
-client.on('error', (err) => {
+client.on('error', err => {
   console.error(`Error connecting to Redis: ${err}`);
 });
 
@@ -22,6 +22,6 @@ const initialise = async () => {
   });
 };
 
-initialise().catch((error) => {
+initialise().catch(error => {
   console.error('Failed to initialize server:', error);
 });

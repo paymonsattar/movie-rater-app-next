@@ -1,4 +1,4 @@
-import { isValidEmail, isValidDate } from '../../src/index'; // Replace the import path with the actual path to your valide.ts file
+import { isValidEmail } from '../../src/index'; // Replace the import path with the actual path to your valide.ts file
 
 describe('isValidEmail', () => {
   it('should return true for valid email addresses', () => {

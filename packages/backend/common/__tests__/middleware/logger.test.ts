@@ -2,20 +2,20 @@ import { Request, Response, NextFunction } from 'express';
 import { requestLogger as logger } from '../../src/index';
 import * as winston from 'winston';
 
-const winstonLogger = winston.createLogger()
+const winstonLogger = winston.createLogger();
 
 const mockInfo = winstonLogger.info;
 const mockError = winstonLogger.error;
 
 // Mock winston logger methods
-jest.mock("winston", () => {
-  const winston = jest.requireActual("winston");
+jest.mock('winston', () => {
+  const winston = jest.requireActual('winston');
   return {
     ...winston,
     createLogger: jest.fn().mockReturnValue({
       info: jest.fn(),
       error: jest.fn(),
-      add: jest.fn(),  // Mock the 'add' method
+      add: jest.fn(), // Mock the 'add' method
     }),
   };
 });
@@ -45,7 +45,9 @@ describe('Logger Middleware', () => {
   it('should correctly log incoming requests', () => {
     logger(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    expect(mockInfo).toHaveBeenCalledWith(expect.stringContaining('Request: GET /test-path'));
+    expect(mockInfo).toHaveBeenCalledWith(
+      expect.stringContaining('Request: GET /test-path')
+    );
     expect(nextFunction).toHaveBeenCalled();
   });
 
@@ -65,7 +67,9 @@ describe('Logger Middleware', () => {
 
     logger(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    expect(mockError).toHaveBeenCalledWith(expect.stringContaining(errorMessage));
+    expect(mockError).toHaveBeenCalledWith(
+      expect.stringContaining(errorMessage)
+    );
     expect(nextFunction).toHaveBeenCalled();
   });
 });
