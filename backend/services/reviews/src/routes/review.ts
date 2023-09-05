@@ -6,8 +6,8 @@ export const createMovieReviewRoutes = (client: RedisClient) => {
   const router = Router();
 
   router.post('/', handlers.addReview(client));
-  router.get('/:id', handlers.getReviews(client));
-  router.get('/:id', handlers.getReviewAverage(client));
+  router.get('/:movieId', handlers.getReviews(client));
+  router.get('/:movieId', handlers.getReviewAverage(client));
 
   return router;
 };
