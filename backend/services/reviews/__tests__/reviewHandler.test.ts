@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import redis from 'redis-mock';
-import { addReview, getReviews, getReviewAverage } from '../src/handlers/reviewHandler'; // Replace with the actual module name
+import { addReview, getReviews, getReviewAverage } from '../src/handlers/reviewHandlers'; // Replace with the actual module name
 import { RedisClient } from '../src/types'; // Replace with the actual module name
 
 jest.mock('redis', () => redis)
