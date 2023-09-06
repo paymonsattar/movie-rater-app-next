@@ -16,13 +16,13 @@ describe('API Response Utilities', () => {
     expect(response).toEqual({
       status: 'success',
       code: 200,
-      data: { message: 'OK' },
+      body: { message: 'OK' },
     });
   });
 
   it('should return 201 Created response with correct data', () => {
     const response = CREATED_RESPONSE({ id: 1 });
-    expect(response).toEqual({ status: 'success', code: 201, data: { id: 1 } });
+    expect(response).toEqual({ status: 'success', code: 201, body: { id: 1 } });
   });
 
   it('should return 204 No Content response with no data', () => {

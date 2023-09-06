@@ -63,14 +63,16 @@ describe('Movies API handlers tests', () => {
       await createMovie(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
+      expect(res.json).toHaveBeenCalledWith({
+        code: 201,
+        body: expect.objectContaining({
           title: 'Movie1',
           genre: 'Action',
           releaseDate: '2022-09-05',
           moviePoster: 'url',
-        })
-      );
+        }),
+        status: 'success'
+      });
     });
 
     it('should return 500 if an error occurs', async () => {
@@ -92,7 +94,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
+        code: 500,
         message: 'Error creating movie',
+        status: 'error',
       });
     });
 
@@ -106,7 +110,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'title, genre, and releaseDate are required fields',
+        status: 'error',
       });
     });
 
@@ -120,7 +126,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'title, genre, and releaseDate are required fields',
+        status: 'error',
       });
     });
 
@@ -134,7 +142,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'title, genre, and releaseDate are required fields',
+        status: 'error',
       });
     });
 
@@ -153,7 +163,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'Invalid data types: title and genre must be strings',
+        status: 'error',
       });
     });
 
@@ -172,7 +184,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'Invalid data types: title and genre must be strings',
+        status: 'error',
       });
     });
 
@@ -191,7 +205,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'Invalid data type: releaseDate must be a date type',
+        status: 'error',
       });
     });
 
@@ -210,7 +226,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'Invalid data type: moviePoster must be a string',
+        status: 'error',
       });
     });
   });
@@ -231,10 +249,14 @@ describe('Movies API handlers tests', () => {
       await getAllMovies(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith([
-        { id: '1', title: 'Movie1' },
-        { id: '2', title: 'Movie2' },
-      ]);
+      expect(res.json).toHaveBeenCalledWith({
+        code: 200,
+        body: [
+          { id: '1', title: 'Movie1' },
+          { id: '2', title: 'Movie2' },
+        ],
+        status: 'success',
+      });
     });
 
     it('should return 500 if an error occurs', async () => {
@@ -249,7 +271,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
+        code: 500,
         message: 'Error fetching movies',
+        status: 'error',
       });
     });
 
@@ -262,22 +286,24 @@ describe('Movies API handlers tests', () => {
       await getAllMovies(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'No movies found' });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 404,
+        message: 'No movies found',
+        status: 'error',
+      });
     });
   });
 
   describe('getMovieById', () => {
     it('should successfully get a movie by ID', async () => {
       // Mocking Redis HGETALL function to return a movie
-      mockRedisClient.HGETALL = jest
-        .fn()
-        .mockResolvedValue({
-          id: '1',
-          title: 'Movie1',
-          genre: 'Action',
-          releaseDate: '2022-09-05',
-          moviePoster: 'url',
-        });
+      mockRedisClient.HGETALL = jest.fn().mockResolvedValue({
+        id: '1',
+        title: 'Movie1',
+        genre: 'Action',
+        releaseDate: '2022-09-05',
+        moviePoster: 'url',
+      });
 
       req = mockRequest({}, { id: '1' });
 
@@ -285,11 +311,15 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
-        id: '1',
-        title: 'Movie1',
-        genre: 'Action',
-        releaseDate: '2022-09-05',
-        moviePoster: 'url',
+        code: 200,
+        body: {
+          id: '1',
+          title: 'Movie1',
+          genre: 'Action',
+          releaseDate: '2022-09-05',
+          moviePoster: 'url',
+        },
+        status: 'success',
       });
     });
 
@@ -305,7 +335,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
+        code: 500,
         message: 'Error fetching movie',
+        status: 'error',
       });
     });
 
@@ -318,7 +350,11 @@ describe('Movies API handlers tests', () => {
       await getMovieById(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Movie not found' });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 404,
+        message: 'Movie not found',
+        status: 'error',
+      });
     });
 
     it('should return 400 for an invalid movie ID format', async () => {
@@ -328,7 +364,9 @@ describe('Movies API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
+        code: 400,
         message: 'Invalid movie ID format',
+        status: 'error',
       });
     });
   });

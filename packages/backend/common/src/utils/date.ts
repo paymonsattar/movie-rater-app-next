@@ -2,13 +2,13 @@ import moment from 'moment';
 
 // 👇️ Used to format dates into a standardized string representation.
 // Useful for ensuring date consistency across various parts of the application.
-export const formatDate = (date: Date, format?: 'DD-MM-YYYY'): string => {
+export const formatDate = (date: Date, format: string = 'YYYY-MM-DD'): string => {
   return moment(date).format(format);
 };
 
 // 👇️ Used to parse a date string into a Date object.
 // Useful for converting client-provided date strings into Date objects that can be used in the application.
-export const parseDate = (dateString: string, format?: 'DD-MM-YYYY'): Date => {
+export const parseDate = (dateString: string, format: string = 'YYYY-MM-DD'): Date => {
   return moment.utc(dateString, format).toDate();
 };
 
@@ -28,7 +28,7 @@ export const addDays = (date: Date, days: number): Date => {
 // Useful for validating client-provided date strings before further processing.
 export const isValidDate = (
   dateString: string,
-  format?: 'DD-MM-YYYY'
+  format?: 'YYYY-MM-DD'
 ): boolean => {
   return moment(dateString, format, true).isValid();
 };
