@@ -31,7 +31,7 @@
     ],
     "paths": {
       "@movie-rater/backend-common": [
-        "packages/backend/common/src/index.ts"
+        "packages/backend/common/src"
       ]
     }
   },
