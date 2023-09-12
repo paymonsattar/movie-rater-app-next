@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Movie, RedisClient } from '../types';
+import { RedisClient } from '../redisClient';
 import { v4 as uuidv4 } from 'uuid';
 import {
   IResponse,
@@ -9,6 +9,7 @@ import {
   NOT_FOUND_RESPONSE,
   INTERNAL_SERVER_ERROR_RESPONSE,
   CREATED_RESPONSE,
+  Movie,
 } from '@movie-rater/backend-common';
 
 // Get all movies
@@ -21,8 +22,7 @@ export const getAllMovies =
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('No movies found'));
       }
 
-      const parsedMovies: Movie[] = movies.map(movie => JSON.parse(movie)); // Using the Movie interface
-
+      const parsedMovies: Movie[] = movies.map(movie => JSON.parse(movie));
       return sendHttpResponse(res, OK_RESPONSE(parsedMovies));
     } catch (error) {
       return sendHttpResponse(
@@ -30,7 +30,7 @@ export const getAllMovies =
         INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movies')
       );
     }
-};
+  };
 
 // Get a single movie by ID
 export const getMovieById =
@@ -58,36 +58,31 @@ export const getMovieById =
         INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movie')
       );
     }
-};
+  };
 
+// Create a new movie
 export const createMovie =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
-    const { moviePoster, title, genre, releaseDate } = req.body;
+    const { title, description, genres, releaseDate, moviePoster } = req.body;
 
-    if (!title || !genre || !releaseDate) {
+    if (!title || !genres || !releaseDate || !description === undefined) {
       return sendHttpResponse(
         res,
-        BAD_REQUEST_RESPONSE(
-          'title, genre, and releaseDate are required fields'
-        )
+        BAD_REQUEST_RESPONSE('title, description, genres, and releaseDate are required fields')
       );
     }
 
-    if (typeof title !== 'string' || typeof genre !== 'string') {
+    if (typeof title !== 'string' || !Array.isArray(genres) || typeof description !== 'string') {
       return sendHttpResponse(
         res,
-        BAD_REQUEST_RESPONSE(
-          'Invalid data types: title and genre must be strings'
-        )
+        BAD_REQUEST_RESPONSE('Invalid data types')
       );
     }
 
     if (isNaN(new Date(releaseDate).getTime())) {
       return sendHttpResponse(
         res,
-        BAD_REQUEST_RESPONSE(
-          'Invalid data type: releaseDate must be a date type'
-        )
+        BAD_REQUEST_RESPONSE('Invalid data type: releaseDate must be a valid date')
       );
     }
 
@@ -101,16 +96,15 @@ export const createMovie =
     const id = uuidv4();
     const movieData: Movie = {
       id,
-      moviePoster,
       title,
-      genre,
-      releaseDate
+      description,
+      genres,
+      releaseDate,
+      moviePoster
     };
 
     try {
-      await client.HSET(`movies:${id}`, movieData as Record<string, any>); // Using the Movie interface
-
-      // Add the new movie to the list of all movies
+      await client.HSET(`movies:${id}`, movieData as Record<string, any>);
       await client.RPUSH('allMovies', JSON.stringify(movieData));
 
       return sendHttpResponse(res, CREATED_RESPONSE(movieData));
@@ -120,4 +114,4 @@ export const createMovie =
         INTERNAL_SERVER_ERROR_RESPONSE('Error creating movie')
       );
     }
-};
+  };

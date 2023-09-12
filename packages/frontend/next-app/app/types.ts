@@ -5,7 +5,7 @@ export interface Movie {
   genres: string[];
   releaseDate: string;
   averageRating: number;
-  posterUrl: string;
+  moviePoster: string;
 }
 
 export interface Review {

@@ -14,6 +14,15 @@ export {
 } from './utils/date';
 
 export {
+  Movie,
+} from './types/movies';
+
+export {
+  Review,
+  AverageReview,
+} from './types/reviews';
+
+export {
   IResponse,
   sendHttpResponse,
   OK_RESPONSE,

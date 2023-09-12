@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RedisClient } from '../types';
+import { RedisClient } from '../redisClient';
 import * as handlers from '../handlers/reviewHandlers';
 
 export const createMovieReviewRoutes = (client: RedisClient) => {

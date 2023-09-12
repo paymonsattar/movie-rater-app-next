@@ -1,11 +1,7 @@
+import { Review } from '../types';
 import { httpRequest } from '../utils/apiUtil';
 
 const baseUrl = 'http://localhost:3002/reviews';
-
-export interface Review {
-  movieId: string;
-  review: number;
-}
 
 /**
  * Add a new review.

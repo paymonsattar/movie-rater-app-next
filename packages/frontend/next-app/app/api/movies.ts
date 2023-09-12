@@ -1,14 +1,7 @@
+import { Movie } from '../types';
 import { httpRequest } from '../utils/apiUtil';
 
 const baseUrl = 'http://localhost:3000/movies';
-
-export interface Movie {
-  id: string;
-  moviePoster?: string;
-  title: string;
-  genre: string;
-  releaseDate: string;
-}
 
 /**
  * Fetch all movies from the API.
@@ -21,7 +14,7 @@ export const getAllMovies = async (): Promise<Movie[]> => {
  * Fetch a single movie by ID from the API.
  * @param id - The ID of the movie.
  */
-export const getMovieById = async (id: string): Promise<Movie> => {
+export const getMovie = async (id: string): Promise<Movie> => {
   return httpRequest<Movie>('GET', `${baseUrl}/${id}`);
 };
 

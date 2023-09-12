@@ -1,71 +1,88 @@
 import { Request, Response } from 'express';
-import { RedisClient } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { RedisClient } from '../redisClient';
 import {
   IResponse,
   sendHttpResponse,
   OK_RESPONSE,
+  BAD_REQUEST_RESPONSE,
   NOT_FOUND_RESPONSE,
   INTERNAL_SERVER_ERROR_RESPONSE,
   CREATED_RESPONSE,
+  Review,
 } from '@movie-rater/backend-common';
 
 export const addReview =
-  (client: RedisClient) => async (req: Request, res: Response) => {
-    const { movieId, review } = req.body;
+  (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
+    const { movieId, rating, comment } = req.body;
 
-    // Validation for missing or empty fields
-    if (!movieId) {
-      return res.status(400).json({ error: 'movieId is required' });
+    if (!movieId || rating === undefined || !comment) {
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('movieId, rating, and comment are required fields')
+      );
     }
 
-    if (!review) {
-      return res.status(400).json({ error: 'review is required' });
-    }
-
-    // Type validation for movieId and review
     if (typeof movieId !== 'string' && typeof movieId !== 'number') {
-      return res.status(400).json({ error: 'Invalid movieId format' });
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid movieId format')
+      );
     }
 
-    // Convert review to number for validation
-    const reviewNumber = Number(review);
-    if (isNaN(reviewNumber) || reviewNumber < 0 || reviewNumber > 5) {
-      return res
-        .status(400)
-        .json({ error: 'Invalid review value, must be between 0 and 5' });
-    }
+    const id = uuidv4();
+    const reviewData: Review = {
+      id,
+      movieId: typeof movieId === 'string' ? Number(movieId) : movieId,
+      rating,
+      comment,
+    };
 
     try {
-      const reply = await client.RPUSH(
-        `reviews:${movieId}`,
-        reviewNumber.toString()
+      await client.RPUSH(`reviews:${movieId}`, JSON.stringify(reviewData));
+      return sendHttpResponse(
+        res,
+        CREATED_RESPONSE({ message: 'Review added', review: reviewData })
       );
-      
-      return sendHttpResponse(res, CREATED_RESPONSE({ message: 'Review added', count: reply }));
     } catch (error) {
-      return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE(error.message));
+      return sendHttpResponse(
+        res,
+        INTERNAL_SERVER_ERROR_RESPONSE(error.message)
+      );
     }
   };
 
 export const getReviews =
-  (client: RedisClient) => async (req: Request, res: Response) => {
+  (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
     const { movieId } = req.params;
 
-    // Validation for movieId
     if (typeof movieId !== 'string' && typeof movieId !== 'number') {
-      return res.status(400).json({ error: 'Invalid movieId format' });
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid movieId format')
+      );
     }
 
     try {
       const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
 
       if (!reply || reply.length === 0) {
-        return sendHttpResponse(res, NOT_FOUND_RESPONSE('No reviews found for this movieId'));
+        return sendHttpResponse(
+          res,
+          NOT_FOUND_RESPONSE('No reviews found for this movieId')
+        );
       }
 
-      return sendHttpResponse(res, OK_RESPONSE({ reviews: reply }));
+      const reviews: Review[] = reply.map(review => JSON.parse(review));
+      return sendHttpResponse(
+        res,
+        OK_RESPONSE({ reviews })
+      );
     } catch (error) {
-      return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE(error.message));
+      return sendHttpResponse(
+        res,
+        INTERNAL_SERVER_ERROR_RESPONSE(error.message)
+      );
     }
   };
 
