@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { httpRequest } from '../utils/apiUtil';
 
 const baseUrl = 'http://localhost:3002/reviews';
 
@@ -12,12 +12,7 @@ export interface Review {
  * @param newReview - The new review object.
  */
 export const addReview = async (newReview: Review): Promise<Review> => {
-  try {
-    const response = await axios.post<Review>(`${baseUrl}/`, newReview);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || 'An error occurred while adding the review');
-  }
+  return httpRequest<Review>('POST', `${baseUrl}/`, newReview);
 };
 
 /**
@@ -25,12 +20,7 @@ export const addReview = async (newReview: Review): Promise<Review> => {
  * @param movieId - The ID of the movie.
  */
 export const getReviews = async (movieId: string): Promise<Review[]> => {
-  try {
-    const response = await axios.get<Review[]>(`${baseUrl}/${movieId}`);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || 'An error occurred while fetching the reviews');
-  }
+  return httpRequest<Review[]>('GET', `${baseUrl}/${movieId}`);
 };
 
 /**
@@ -38,10 +28,5 @@ export const getReviews = async (movieId: string): Promise<Review[]> => {
  * @param movieId - The ID of the movie.
  */
 export const getReviewAverage = async (movieId: string): Promise<number> => {
-  try {
-    const response = await axios.get<number>(`${baseUrl}/${movieId}`);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || 'An error occurred while fetching the review average');
-  }
+  return httpRequest<number>('GET', `${baseUrl}/${movieId}`);
 };
