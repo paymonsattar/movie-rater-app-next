@@ -2,12 +2,12 @@ import axios from 'axios';
 
 const baseUrl = 'http://localhost:3000/movies';
 
-// Interface to type the Movie
 export interface Movie {
-  id?: string;
+  id: string;
+  moviePoster?: string;
   title: string;
   genre: string;
-  // ... any other fields
+  releaseDate: string;
 }
 
 /**
