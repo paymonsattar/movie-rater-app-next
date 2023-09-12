@@ -15,6 +15,7 @@ export {
 
 export {
   IResponse,
+  sendHttpResponse,
   OK_RESPONSE,
   CREATED_RESPONSE,
   NO_CONTENT_RESPONSE,

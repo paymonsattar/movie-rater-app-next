@@ -1,24 +1,27 @@
 import { Request, Response } from 'express';
-import { RedisClient } from '../types';
+import { Movie, RedisClient } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import {
   IResponse,
+  sendHttpResponse,
   OK_RESPONSE,
   BAD_REQUEST_RESPONSE,
   NOT_FOUND_RESPONSE,
   INTERNAL_SERVER_ERROR_RESPONSE,
   CREATED_RESPONSE,
 } from '@movie-rater/backend-common';
+
 // Get all movies
 export const getAllMovies =
-  (client: RedisClient) => async (req: Request, res: Response) => {
+  (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
     try {
       const movies = await client.LRANGE('allMovies', 0, -1);
 
       if (!movies || movies.length === 0) {
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('No movies found'));
       }
-      const parsedMovies = movies.map(movie => JSON.parse(movie));
+
+      const parsedMovies: Movie[] = movies.map(movie => JSON.parse(movie)); // Using the Movie interface
 
       return sendHttpResponse(res, OK_RESPONSE(parsedMovies));
     } catch (error) {
@@ -27,11 +30,11 @@ export const getAllMovies =
         INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movies')
       );
     }
-  };
+};
 
 // Get a single movie by ID
 export const getMovieById =
-  (client: RedisClient) => async (req: Request, res: Response) => {
+  (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
@@ -42,7 +45,7 @@ export const getMovieById =
     }
 
     try {
-      const movie = await client.HGETALL(`movies:${id}`);
+      const movie = await client.HGETALL(`movies:${id}`) as unknown as Movie;
 
       if (!movie || Object.keys(movie).length === 0) {
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('Movie not found'));
@@ -55,10 +58,10 @@ export const getMovieById =
         INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movie')
       );
     }
-  };
+};
 
 export const createMovie =
-  (client: RedisClient) => async (req: Request, res: Response) => {
+  (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
     const { moviePoster, title, genre, releaseDate } = req.body;
 
     if (!title || !genre || !releaseDate) {
@@ -95,30 +98,26 @@ export const createMovie =
       );
     }
 
-    const id = uuidv4(); // Generate a unique identifier for the new movie
-
-    const movieData = {
+    const id = uuidv4();
+    const movieData: Movie = {
+      id,
       moviePoster,
       title,
       genre,
-      releaseDate,
+      releaseDate
     };
 
     try {
-      await client.HSET(`movies:${id}`, movieData);
+      await client.HSET(`movies:${id}`, movieData as Record<string, any>); // Using the Movie interface
 
       // Add the new movie to the list of all movies
-      await client.RPUSH('allMovies', JSON.stringify({ id, ...movieData }));
+      await client.RPUSH('allMovies', JSON.stringify(movieData));
 
-      return sendHttpResponse(res, CREATED_RESPONSE({ id, ...movieData }));
+      return sendHttpResponse(res, CREATED_RESPONSE(movieData));
     } catch (error) {
       return sendHttpResponse(
         res,
         INTERNAL_SERVER_ERROR_RESPONSE('Error creating movie')
       );
     }
-  };
-
-const sendHttpResponse = (res: Response, httpResponse: IResponse) => {
-  return res.status(httpResponse.code).json(httpResponse);
 };

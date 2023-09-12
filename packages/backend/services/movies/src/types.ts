@@ -1,13 +1,11 @@
 import { createClient } from 'redis';
 
-export interface Review {
-  movieId: string;
-  review: number;
-}
-
-export interface AverageReview {
-  movieId: string;
-  averageReview: number;
+export interface Movie {
+  id: string;
+  moviePoster?: string;
+  title: string;
+  genre: string;
+  releaseDate: string;
 }
 
 export type RedisClient = ReturnType<typeof createClient>;

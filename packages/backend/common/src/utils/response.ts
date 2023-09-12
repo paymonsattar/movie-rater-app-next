@@ -10,6 +10,10 @@ export interface IResponse {
   message?: string;
 }
 
+export const sendHttpResponse = (res: Response, httpResponse: IResponse) => {
+  return res.status(httpResponse.code).json(httpResponse);
+};
+
 // 👇️ Used for successful GET requests to return requested data.
 export const OK_RESPONSE = (data: ResponseData): IResponse => {
   return {
