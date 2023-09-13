@@ -15,8 +15,10 @@ import {
 
 const fetchAverageRating = async (movieId: string) => {
   try {
-    const response = await axios.get(`http://localhost:3002/reviews/${movieId}/average`);
-    
+    const response = await axios.get(
+      `http://localhost:3002/reviews/${movieId}/average`
+    );
+
     return response.data.body.average;
   } catch (error) {
     return 0;
@@ -33,17 +35,19 @@ export const getAllMovies =
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('No movies found'));
       }
 
-      const parsedMovies: Movie[] = await Promise.all(movies.map(async movie => {
-        // Calculate average rating for each movie
-        const parsed = JSON.parse(movie);
-        parsed.averageRating = await fetchAverageRating(parsed.id);
-        // Genres must be parsed seperately and Movie is flattened when adding to db
-        if (typeof parsed.genres === 'string') {
-          parsed.genres = JSON.parse(parsed.genres)
-        }
+      const parsedMovies: Movie[] = await Promise.all(
+        movies.map(async movie => {
+          // Calculate average rating for each movie
+          const parsed = JSON.parse(movie);
+          parsed.averageRating = await fetchAverageRating(parsed.id);
+          // Genres must be parsed seperately and Movie is flattened when adding to db
+          if (typeof parsed.genres === 'string') {
+            parsed.genres = JSON.parse(parsed.genres);
+          }
 
-        return parsed;
-      }));
+          return parsed;
+        })
+      );
 
       return sendHttpResponse(res, OK_RESPONSE(parsedMovies));
     } catch (error) {
@@ -66,15 +70,15 @@ export const getMovieById =
       );
     }
 
- try {
-      const movie = await client.HGETALL(`movies:${id}`) as unknown as Movie;
+    try {
+      const movie = (await client.HGETALL(`movies:${id}`)) as unknown as Movie;
 
       if (!movie || Object.keys(movie).length === 0) {
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('Movie not found'));
       }
 
       if (typeof movie.genres === 'string') {
-        movie.genres = JSON.parse(movie.genres)
+        movie.genres = JSON.parse(movie.genres);
       }
 
       movie.averageRating = await fetchAverageRating(movie.id);
@@ -99,27 +103,32 @@ export const createMovie =
       runtime,
       actors,
       releaseDate,
-      moviePoster 
+      moviePoster,
     } = req.body;
 
     if (!title || !genres || !releaseDate || !description) {
       return sendHttpResponse(
         res,
-        BAD_REQUEST_RESPONSE('title, description, genres, and releaseDate are required fields')
+        BAD_REQUEST_RESPONSE(
+          'title, description, genres, and releaseDate are required fields'
+        )
       );
     }
 
-    if (typeof title !== 'string' || !Array.isArray(genres) || typeof description !== 'string') {
-      return sendHttpResponse(
-        res,
-        BAD_REQUEST_RESPONSE('Invalid data types')
-      );
+    if (
+      typeof title !== 'string' ||
+      !Array.isArray(genres) ||
+      typeof description !== 'string'
+    ) {
+      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data types'));
     }
 
     if (isNaN(new Date(releaseDate).getTime())) {
       return sendHttpResponse(
         res,
-        BAD_REQUEST_RESPONSE('Invalid data type: releaseDate must be a valid date')
+        BAD_REQUEST_RESPONSE(
+          'Invalid data type: releaseDate must be a valid date'
+        )
       );
     }
 
@@ -140,25 +149,26 @@ export const createMovie =
       runtime,
       actors,
       releaseDate,
-      moviePoster
+      moviePoster,
     };
-    
+
     // Flatten the object into an array of strings
     type HSETObject = Record<string, string | number>;
 
     const hsetObject: HSETObject = {};
-    
+
     for (const [key, value] of Object.entries(movieData)) {
-      hsetObject[key] = typeof value === 'object' ? JSON.stringify(value) : value;
+      hsetObject[key] =
+        typeof value === 'object' ? JSON.stringify(value) : value;
     }
-    
+
     try {
       // Use the JavaScript spread syntax to pass the array elements as arguments to HSET
       await client.HSET(`movies:${id}`, hsetObject);
-    
+
       // Add the movie data to a list
       await client.RPUSH('allMovies', JSON.stringify(movieData));
-    
+
       return sendHttpResponse(res, CREATED_RESPONSE(movieData));
     } catch (error) {
       return sendHttpResponse(

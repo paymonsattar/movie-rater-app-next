@@ -9,25 +9,24 @@ const MovieCardList = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        console.log('fetching movies');
         const fetchedMovies = await getAllMovies();
+
         setMovies(fetchedMovies);
       } catch (error) {
         console.error('error fetching movies:', error);
       }
     };
-    
+
     fetchMovies();
   }, []);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {movies.map((movie) => (
+      {movies.map(movie => (
         <MovieCard key={movie.id} movie={movie} />
       ))}
     </div>
   );
 };
-
 
 export default MovieCardList;

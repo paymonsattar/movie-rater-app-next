@@ -15,10 +15,7 @@ export interface IResponse {
  * Fetch all movies from the API.
  */
 export const getAllMovies = async (): Promise<Movie[]> => {
-  const response = await httpRequest<IResponse>(
-    'GET',
-    `${baseUrl}/`,
-  );
+  const response = await httpRequest<IResponse>('GET', `${baseUrl}/`);
 
   // TODO Replace with logger
   console.log('HTTP Response:', response);
@@ -31,13 +28,10 @@ export const getAllMovies = async (): Promise<Movie[]> => {
  * @param id - The ID of the movie.
  */
 export const getMovie = async (id: string): Promise<Movie> => {
-  const response = await httpRequest<IResponse>(
-    'GET',
-    `${baseUrl}/${id}`,
-  );
+  const response = await httpRequest<IResponse>('GET', `${baseUrl}/${id}`);
 
   // TODO Replace with logger
-  console.log('HTTP Response:', response);
+  console.log('HTTP Response:', id, response);
 
   return response.body as Movie;
 };
@@ -50,11 +44,11 @@ export const createMovie = async (newMovie: Movie): Promise<Movie> => {
   const response = await httpRequest<IResponse>(
     'POST',
     `${baseUrl}/}`,
-    newMovie,
+    newMovie
   );
 
   // TODO Replace with logger
-  console.log('HTTP Response:', response);
+  console.log('HTTP Response:', newMovie, response);
 
   return response.body as Movie;
 };

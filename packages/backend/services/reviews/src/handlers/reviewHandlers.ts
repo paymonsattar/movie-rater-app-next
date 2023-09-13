@@ -74,10 +74,7 @@ export const getReviews =
       }
 
       const reviews: Review[] = reply.map(review => JSON.parse(review));
-      return sendHttpResponse(
-        res,
-        OK_RESPONSE({ reviews })
-      );
+      return sendHttpResponse(res, OK_RESPONSE({ reviews }));
     } catch (error) {
       return sendHttpResponse(
         res,
@@ -86,7 +83,7 @@ export const getReviews =
     }
   };
 
-  export const getReviewAverage =
+export const getReviewAverage =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
     const { movieId } = req.params;
 
@@ -94,22 +91,27 @@ export const getReviews =
       const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
 
       if (!reply || reply.length === 0) {
-        return sendHttpResponse(res, NOT_FOUND_RESPONSE('No reviews found for this movieId'));
+        return sendHttpResponse(
+          res,
+          NOT_FOUND_RESPONSE('No reviews found for this movieId')
+        );
       }
 
       const reviews = reply.map(review => {
-        const parsedReview = JSON.parse(review)
-        
-        return parsedReview.rating
+        const parsedReview = JSON.parse(review);
+
+        return parsedReview.rating;
       });
 
       const total = reviews.reduce((acc, val) => acc + val, 0);
       const average = total / reviews.length || 0;
-      const roundedAverage = Math.round(average * 10) / 10
+      const roundedAverage = Math.round(average * 10) / 10;
 
       return sendHttpResponse(res, OK_RESPONSE({ average: roundedAverage }));
     } catch (error) {
-      return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE(error.message));
+      return sendHttpResponse(
+        res,
+        INTERNAL_SERVER_ERROR_RESPONSE(error.message)
+      );
     }
   };
-

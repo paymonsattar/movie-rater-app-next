@@ -9,4 +9,3 @@ export interface AverageReview {
   movieId: string;
   averageReview: number;
 }
-

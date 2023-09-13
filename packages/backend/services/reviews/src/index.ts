@@ -15,12 +15,14 @@ const initialise = async () => {
   const app = express();
   const port = 3002;
 
-  app.use(cors({
-    origin: [
-      'http://localhost:4200', // Next Frontend
-      'http://localhost:3000', // Movies rest api
-    ]
-  }));
+  app.use(
+    cors({
+      origin: [
+        'http://localhost:4200', // Next Frontend
+        'http://localhost:3000', // Movies rest api
+      ],
+    })
+  );
 
   app.use(express.json());
   app.use('/reviews/', createMovieReviewRoutes(client));

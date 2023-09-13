@@ -8,16 +8,19 @@ interface RatingProps {
 }
 
 const Rating = ({ movie, onRatingSubmit }: RatingProps) => {
-  const [hoverRating, setHoverRating] = useState(0);
-  const [selectedRating, setSelectedRating] = useState(1);
-  const [comment, setComment] = useState('');
+  const DEFAULT_RATING = 1;
+  const DEFAULT_COMMENT = '';
+
+  const [hoverRating, setHoverRating] = useState(DEFAULT_RATING);
+  const [selectedRating, setSelectedRating] = useState(DEFAULT_RATING);
+  const [comment, setComment] = useState(DEFAULT_COMMENT);
 
   const handleMouseOver = (rating: number) => {
     setHoverRating(rating);
   };
 
   const handleMouseLeave = () => {
-    setHoverRating(1);
+    setHoverRating(DEFAULT_RATING);
   };
 
   const handleClick = (rating: number) => {
@@ -31,29 +34,29 @@ const Rating = ({ movie, onRatingSubmit }: RatingProps) => {
       comment,
     };
 
-    try {
-      await addReview(newReview);
+    await addReview(newReview);
+    await onRatingSubmit();
 
-      await onRatingSubmit()
-    } catch (error) {}
-    
-    // Reset the form (Optional)
-    setSelectedRating(1);
-    setComment('');
+    setSelectedRating(DEFAULT_RATING);
+    setComment(DEFAULT_COMMENT);
   };
 
   const handleReset = () => {
-    setSelectedRating(1);
-    setComment('');
+    setSelectedRating(DEFAULT_RATING);
+    setComment(DEFAULT_COMMENT);
   };
 
   return (
     <div className="flex flex-col items-center">
       <div className="flex">
-        {[1, 2, 3, 4, 5].map((index) => (
+        {[1, 2, 3, 4, 5].map(index => (
           <svg
             key={index}
-            className={`w-8 h-8 cursor-pointer ${index <= (hoverRating || selectedRating) ? 'text-yellow-300' : 'text-gray-200'} mx-1`}
+            className={`w-8 h-8 cursor-pointer ${
+              index <= (hoverRating || selectedRating)
+                ? 'text-yellow-300'
+                : 'text-gray-200'
+            } mx-1`}
             onMouseOver={() => handleMouseOver(index)}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleClick(index)}
@@ -70,7 +73,7 @@ const Rating = ({ movie, onRatingSubmit }: RatingProps) => {
           className="w-full p-2 rounded border"
           placeholder="Write your review here..."
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={e => setComment(e.target.value)}
         />
       </div>
       <div className="mt-4"></div>

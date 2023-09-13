@@ -71,7 +71,7 @@ describe('Movies API handlers tests', () => {
           releaseDate: '2022-09-05',
           moviePoster: 'url',
         }),
-        status: 'success'
+        status: 'success',
       });
     });
 

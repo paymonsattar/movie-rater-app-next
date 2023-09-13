@@ -19,7 +19,7 @@ export const addReview = async (newReview: Review): Promise<Review> => {
   const response = await httpRequest<IResponse>(
     'POST',
     `${baseUrl}/`,
-    newReview,
+    newReview
   );
 
   // TODO Replace with logger
@@ -33,10 +33,7 @@ export const addReview = async (newReview: Review): Promise<Review> => {
  * @param movieId - The ID of the movie.
  */
 export const getReviews = async (movieId: string): Promise<Review[]> => {
-  const response = await httpRequest<IResponse>(
-    'GET',
-    `${baseUrl}/${movieId}`,
-  );
+  const response = await httpRequest<IResponse>('GET', `${baseUrl}/${movieId}`);
 
   // TODO Replace with logger
   console.log('HTTP Response:', response);
@@ -49,10 +46,7 @@ export const getReviews = async (movieId: string): Promise<Review[]> => {
  * @param movieId - The ID of the movie.
  */
 export const getReviewAverage = async (movieId: string): Promise<number> => {
-  const response = await httpRequest<IResponse>(
-    'GET',
-    `${baseUrl}/${movieId}`,
-  );
+  const response = await httpRequest<IResponse>('GET', `${baseUrl}/${movieId}`);
 
   // TODO Replace with logger
   console.log('HTTP Response:', response);

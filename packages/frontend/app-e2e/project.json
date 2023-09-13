@@ -19,18 +19,12 @@
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "packages/frontend/app-e2e/**/*.{js,ts}"
-        ]
+        "lintFilePatterns": ["packages/frontend/app-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": [
-    "frontend-next-app"
-  ]
+  "implicitDependencies": ["frontend-next-app"]
 }

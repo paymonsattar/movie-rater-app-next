@@ -13,7 +13,7 @@ const MovieDetail = () => {
 
   // Use optional chaining and nullish coalescing to safely extract and convert id to string
   const id = useMemo(() => {
-    return router.query?.id?.toString?.() ?? "";
+    return router.query?.id?.toString?.() ?? '';
   }, [router.query?.id]);
 
   useEffect(() => {
@@ -22,13 +22,13 @@ const MovieDetail = () => {
 
   const fetchMovie = async () => {
     if (!id) {
-      console.log(`error with ${id}`)
+      console.log(`error with ${id}`);
       return;
     }
 
     try {
       const fetchedMovie = await getMovie(id);
-      console.log('fetchedMovie', fetchedMovie)
+      console.log('fetchedMovie', fetchedMovie);
       setMovie(fetchedMovie);
     } catch (err) {
       console.error(`Error fetching movie: ${id}`, err);
@@ -37,7 +37,7 @@ const MovieDetail = () => {
 
   const onRatingSubmit = async () => {
     fetchMovie();
-  }
+  };
 
   if (!movie) {
     return <div>Movie not found</div>;
@@ -53,7 +53,7 @@ const MovieDetail = () => {
         <div className="flex flex-col md:flex-row mt-8">
           <MovieDetailComponent movie={movie} />
         </div>
-        
+
         <div className="mt-8">
           <RatingComponent movie={movie} onRatingSubmit={onRatingSubmit} />
         </div>

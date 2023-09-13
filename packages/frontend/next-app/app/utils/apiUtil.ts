@@ -21,6 +21,9 @@ export const httpRequest = async <T>(
 
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || `An error occurred while making the API call to ${url}`);
+    throw new Error(
+      error.response?.data?.error ||
+        `An error occurred while making the API call to ${url}`
+    );
   }
 };

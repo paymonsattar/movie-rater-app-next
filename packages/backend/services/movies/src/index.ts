@@ -3,7 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import { createClient } from 'redis';
 import { createMovieRoutes } from './routes/movie';
-import { populateMovies } from './utils/populateMovies';  // adjust the import path as needed
+import { populateMovies } from './utils/populateMovies'; // adjust the import path as needed
 
 const client = createClient();
 
@@ -17,9 +17,11 @@ const initialise = async () => {
   const app = express();
   const port = 3000;
 
-  app.use(cors({
-    origin: 'http://localhost:4200'
-  }));
+  app.use(
+    cors({
+      origin: 'http://localhost:4200',
+    })
+  );
 
   app.use(express.json());
   app.use('/movies/', createMovieRoutes(client));
