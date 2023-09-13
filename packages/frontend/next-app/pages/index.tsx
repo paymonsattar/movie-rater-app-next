@@ -15,7 +15,7 @@ const IndexPage = () => {
           const fetchedMovies = await getAllMovies();
           setMovies(fetchedMovies);
         } catch (error) {
-          console.error(error);
+          console.error('error', error);
         }
       };
       

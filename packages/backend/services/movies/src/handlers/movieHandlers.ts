@@ -1,6 +1,7 @@
+import axios from 'axios';
 import { Request, Response } from 'express';
-import { RedisClient } from '../redisClient';
 import { v4 as uuidv4 } from 'uuid';
+import { RedisClient } from '../redisClient';
 import {
   IResponse,
   sendHttpResponse,
@@ -12,6 +13,16 @@ import {
   Movie,
 } from '@movie-rater/backend-common';
 
+const fetchAverageRating = async (movieId: string) => {
+  try {
+    const response = await axios.get(`http://localhost:3002/reviews/${movieId}/average`);
+    return response.data.averageRating;
+  } catch (error) {
+    console.error('Error fetching average rating:', error);
+    return null;
+  }
+};
+
 // Get all movies
 export const getAllMovies =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
@@ -22,7 +33,13 @@ export const getAllMovies =
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('No movies found'));
       }
 
-      const parsedMovies: Movie[] = movies.map(movie => JSON.parse(movie));
+      const parsedMovies: Movie[] = await Promise.all(movies.map(async movie => {
+        const parsed = JSON.parse(movie);
+        parsed.averageRating = await fetchAverageRating(parsed.id);
+
+        return parsed;
+      }));
+
       return sendHttpResponse(res, OK_RESPONSE(parsedMovies));
     } catch (error) {
       return sendHttpResponse(
@@ -44,12 +61,14 @@ export const getMovieById =
       );
     }
 
-    try {
+ try {
       const movie = await client.HGETALL(`movies:${id}`) as unknown as Movie;
 
       if (!movie || Object.keys(movie).length === 0) {
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('Movie not found'));
       }
+
+      movie.averageRating = await fetchAverageRating(id);
 
       return sendHttpResponse(res, OK_RESPONSE(movie));
     } catch (error) {
@@ -63,9 +82,18 @@ export const getMovieById =
 // Create a new movie
 export const createMovie =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
-    const { title, description, genres, releaseDate, moviePoster } = req.body;
+    const {
+      title,
+      description,
+      genres,
+      director,
+      runtime,
+      actors,
+      releaseDate,
+      moviePoster 
+    } = req.body;
 
-    if (!title || !genres || !releaseDate || !description === undefined) {
+    if (!title || !genres || !releaseDate || !description) {
       return sendHttpResponse(
         res,
         BAD_REQUEST_RESPONSE('title, description, genres, and releaseDate are required fields')
@@ -99,16 +127,35 @@ export const createMovie =
       title,
       description,
       genres,
+      director,
+      runtime,
+      actors,
       releaseDate,
       moviePoster
     };
+    
+    // Flatten the object into an array of strings
+    type HSETObject = Record<string, string | number>;
 
+    const hsetObject: HSETObject = {};
+    
+    for (const [key, value] of Object.entries(movieData)) {
+      hsetObject[key] = typeof value === 'object' ? JSON.stringify(value) : value;
+    }
+    
     try {
-      await client.HSET(`movies:${id}`, movieData as Record<string, any>);
+      console.log('movieData', movieData);
+      console.log('hsetObject', hsetObject);
+    
+      // Use the JavaScript spread syntax to pass the array elements as arguments to HSET
+      await client.HSET(`movies:${id}`, hsetObject);
+    
+      // Add the movie data to a list
       await client.RPUSH('allMovies', JSON.stringify(movieData));
-
+    
       return sendHttpResponse(res, CREATED_RESPONSE(movieData));
     } catch (error) {
+      console.log('error', error);
       return sendHttpResponse(
         res,
         INTERNAL_SERVER_ERROR_RESPONSE('Error creating movie')

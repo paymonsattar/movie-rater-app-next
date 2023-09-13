@@ -5,7 +5,7 @@ import {
   getReviews,
   getReviewAverage,
 } from '../src/handlers/reviewHandlers'; // Replace with the actual module name
-import { RedisClient } from '../src/types'; // Replace with the actual module name
+import { RedisClient } from '../src/redisClient'; // Replace with the actual module name
 
 jest.mock('redis', () => redis);
 

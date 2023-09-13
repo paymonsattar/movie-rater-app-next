@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import { createClient } from 'redis';
 import { createMovieReviewRoutes } from './routes/review';
@@ -14,6 +15,13 @@ const initialise = async () => {
   const app = express();
   const port = 3002;
 
+  app.use(cors({
+    origin: [
+      'http://localhost:4200', // Next Frontend
+      'http://localhost:3000', // Movies rest api
+    ]
+  }));
+
   app.use(express.json());
   app.use('/reviews/', createMovieReviewRoutes(client));
 
@@ -23,5 +31,5 @@ const initialise = async () => {
 };
 
 initialise().catch(error => {
-  console.error('Failed to initialize server:', error);
+  console.error('Failed to initialise server:', error);
 });
