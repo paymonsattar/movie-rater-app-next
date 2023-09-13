@@ -1,19 +1,33 @@
-import React from 'react';
-import MovieCard from './MovieCard';
+import React, { useEffect, useState } from 'react';
 import { Movie } from '../../app/types';
+import MovieCard from '../../components/movies/MovieCard';
+import { getAllMovies } from '../../app/api/movies';
 
-interface MovieCardListProps {
-  movies: Movie[];
-}
+const MovieCardList = () => {
+  const [movies, setMovies] = useState<Movie[]>([]);
 
-const MovieCardList: React.FC<MovieCardListProps> = ({ movies }) => {
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        console.log('fetching movies');
+        const fetchedMovies = await getAllMovies();
+        setMovies(fetchedMovies);
+      } catch (error) {
+        console.error('error fetching movies:', error);
+      }
+    };
+    
+    fetchMovies();
+  }, []);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 dark:bg-gray-900">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {movies.map((movie) => (
         <MovieCard key={movie.id} movie={movie} />
       ))}
     </div>
   );
 };
+
 
 export default MovieCardList;

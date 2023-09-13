@@ -11,7 +11,6 @@ export interface IResponse {
 }
 
 export const sendHttpResponse = (res: Response, httpResponse: IResponse) => {
-  console.log('httpResponse.code', httpResponse.code)
   return res.status(httpResponse.code).json(httpResponse);
 };
 

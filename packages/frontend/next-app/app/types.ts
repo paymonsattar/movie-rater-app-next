@@ -12,8 +12,8 @@ export interface Movie {
 }
 
 export interface Review {
-  id: number;
-  movieId: number;
+  id?: string;
+  movieId: string;
   rating: number;
   comment: string;
 }

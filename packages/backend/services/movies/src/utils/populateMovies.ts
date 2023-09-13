@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { Request, Response } from 'express';
 import { RedisClient } from '../redisClient';
 import { createMovie } from '../handlers/movieHandlers';
@@ -10,8 +9,6 @@ export const populateMovies = async (client: RedisClient) => {
     const parsedMovies = erikSytnykMoviesList.movies;
 
     for (const movie of parsedMovies) {
-      console.log(`Creating Movie: ${movie.id}`, movie)
-
       const movieData = {
         title: movie.title,
         description: movie.plot,
@@ -34,8 +31,8 @@ export const populateMovies = async (client: RedisClient) => {
           return this;
         },
         json: function (data: any) {
-          console.log('data', data)
-          // Do something with the data if needed, or just return it
+          // Do something with the data if needed
+          // for now just returning it.
           return data;
         },
       } as unknown as Response;

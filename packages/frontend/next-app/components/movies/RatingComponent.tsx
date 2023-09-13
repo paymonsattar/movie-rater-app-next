@@ -1,31 +1,50 @@
 import React, { useState } from 'react';
+import { Movie, Review } from '../../app/types';
+import { addReview } from '../../app/api/reviews';
 
 interface RatingProps {
-  submitRating: (rating: number) => void;  // Replace with your actual backend function
+  movie: Movie;
+  onRatingSubmit: () => Promise<void>;
 }
 
-const Rating: React.FC<RatingProps> = ({ submitRating }) => {
+const Rating = ({ movie, onRatingSubmit }: RatingProps) => {
   const [hoverRating, setHoverRating] = useState(0);
-  const [selectedRating, setSelectedRating] = useState(0);
+  const [selectedRating, setSelectedRating] = useState(1);
+  const [comment, setComment] = useState('');
 
   const handleMouseOver = (rating: number) => {
     setHoverRating(rating);
   };
 
   const handleMouseLeave = () => {
-    setHoverRating(0);
+    setHoverRating(1);
   };
 
   const handleClick = (rating: number) => {
     setSelectedRating(rating);
   };
 
-  const handleSubmit = () => {
-    submitRating(selectedRating);
+  const handleSubmit = async () => {
+    const newReview: Review = {
+      movieId: movie.id,
+      rating: selectedRating,
+      comment,
+    };
+
+    try {
+      await addReview(newReview);
+
+      await onRatingSubmit()
+    } catch (error) {}
+    
+    // Reset the form (Optional)
+    setSelectedRating(1);
+    setComment('');
   };
 
   const handleReset = () => {
-    setSelectedRating(0);
+    setSelectedRating(1);
+    setComment('');
   };
 
   return (
@@ -46,9 +65,15 @@ const Rating: React.FC<RatingProps> = ({ submitRating }) => {
           </svg>
         ))}
       </div>
-      <div className="mt-2">
-        <span className="text-lg font-semibold">Current Rating: {selectedRating}</span>
+      <div className="mt-4">
+        <textarea
+          className="w-full p-2 rounded border"
+          placeholder="Write your review here..."
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
       </div>
+      <div className="mt-4"></div>
       <div className="mt-4">
         <button
           onClick={handleSubmit}

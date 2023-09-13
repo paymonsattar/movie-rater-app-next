@@ -1,8 +1,8 @@
 export interface Review {
   id: string;
-  movieId: number;
+  movieId: string;
   rating: number;
-  comment: string;
+  comment?: string;
 }
 
 export interface AverageReview {

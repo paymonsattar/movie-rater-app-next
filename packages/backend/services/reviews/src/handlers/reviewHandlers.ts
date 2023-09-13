@@ -23,7 +23,7 @@ export const addReview =
       );
     }
 
-    if (typeof movieId !== 'string' && typeof movieId !== 'number') {
+    if (typeof movieId !== 'string') {
       return sendHttpResponse(
         res,
         BAD_REQUEST_RESPONSE('Invalid movieId format')
@@ -33,7 +33,7 @@ export const addReview =
     const id = uuidv4();
     const reviewData: Review = {
       id,
-      movieId: typeof movieId === 'string' ? Number(movieId) : movieId,
+      movieId,
       rating,
       comment,
     };
@@ -97,11 +97,17 @@ export const getReviews =
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('No reviews found for this movieId'));
       }
 
-      const reviews = reply.map(Number);
+      const reviews = reply.map(review => {
+        const parsedReview = JSON.parse(review)
+        
+        return parsedReview.rating
+      });
+
       const total = reviews.reduce((acc, val) => acc + val, 0);
       const average = total / reviews.length || 0;
+      const roundedAverage = Math.round(average * 10) / 10
 
-      return sendHttpResponse(res, OK_RESPONSE({ average }));
+      return sendHttpResponse(res, OK_RESPONSE({ average: roundedAverage }));
     } catch (error) {
       return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE(error.message));
     }

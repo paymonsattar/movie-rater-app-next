@@ -16,10 +16,10 @@ import {
 const fetchAverageRating = async (movieId: string) => {
   try {
     const response = await axios.get(`http://localhost:3002/reviews/${movieId}/average`);
-    return response.data.averageRating;
+    
+    return response.data.body.average;
   } catch (error) {
-    console.error('Error fetching average rating:', error);
-    return null;
+    return 0;
   }
 };
 
@@ -34,8 +34,13 @@ export const getAllMovies =
       }
 
       const parsedMovies: Movie[] = await Promise.all(movies.map(async movie => {
+        // Calculate average rating for each movie
         const parsed = JSON.parse(movie);
         parsed.averageRating = await fetchAverageRating(parsed.id);
+        // Genres must be parsed seperately and Movie is flattened when adding to db
+        if (typeof parsed.genres === 'string') {
+          parsed.genres = JSON.parse(parsed.genres)
+        }
 
         return parsed;
       }));
@@ -68,7 +73,11 @@ export const getMovieById =
         return sendHttpResponse(res, NOT_FOUND_RESPONSE('Movie not found'));
       }
 
-      movie.averageRating = await fetchAverageRating(id);
+      if (typeof movie.genres === 'string') {
+        movie.genres = JSON.parse(movie.genres)
+      }
+
+      movie.averageRating = await fetchAverageRating(movie.id);
 
       return sendHttpResponse(res, OK_RESPONSE(movie));
     } catch (error) {
@@ -144,9 +153,6 @@ export const createMovie =
     }
     
     try {
-      console.log('movieData', movieData);
-      console.log('hsetObject', hsetObject);
-    
       // Use the JavaScript spread syntax to pass the array elements as arguments to HSET
       await client.HSET(`movies:${id}`, hsetObject);
     
@@ -155,7 +161,6 @@ export const createMovie =
     
       return sendHttpResponse(res, CREATED_RESPONSE(movieData));
     } catch (error) {
-      console.log('error', error);
       return sendHttpResponse(
         res,
         INTERNAL_SERVER_ERROR_RESPONSE('Error creating movie')
