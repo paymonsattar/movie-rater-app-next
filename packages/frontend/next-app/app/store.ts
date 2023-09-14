@@ -7,6 +7,12 @@ import {
 } from '@reduxjs/toolkit';
 import { getAllMovies, IResponse } from '../app/api/movies';
 import { Movie } from './types';
+import { MOVIE_GENRES } from './consts';
+
+interface ReviewRatingRange {
+  min: number;
+  max: number;
+}
 
 // Async Thunk for fetching all movies
 export const fetchAllMovies = createAsyncThunk<
@@ -22,16 +28,32 @@ export const fetchAllMovies = createAsyncThunk<
   }
 });
 
-export const searchMovies = (term: string) => (dispatch: AppDispatch, getState: () => RootState) => {
-  dispatch(setSearchTerm(term));
-  
-  const allMovies = getState().movies.items;
-  const filteredMovies = allMovies.filter(
-    movie => 
-      movie.title.toLowerCase().includes(term.toLowerCase()) ||
-      movie.description.toLowerCase().includes(term.toLowerCase())
+export const searchMovies = () => (dispatch: AppDispatch, getState: () => RootState) => {
+  const { items: allMovies, selectedGenres, reviewRatingRange, searchTerm } = getState().movies;
+
+  let filteredMovies = allMovies;
+
+  // Apply search term filter
+  if (searchTerm) {
+    filteredMovies = filteredMovies.filter(
+      movie => 
+        movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        movie.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // Apply genre filter
+  if (selectedGenres.length > 0) {
+    filteredMovies = filteredMovies.filter(movie =>
+      selectedGenres.some(genre => movie.genres.includes(genre))
+    );
+  }
+
+  // Apply rating filter
+  filteredMovies = filteredMovies.filter(movie => 
+    movie.averageRating >= reviewRatingRange.min
   );
-  
+
   dispatch(setFilteredMovies(filteredMovies));
 };
 
@@ -42,14 +64,22 @@ const movieSlice = createSlice({
     filteredItems: [] as Movie[],
     status: 'idle',
     searchTerm: '' as string,
+    selectedGenres: [] as MOVIE_GENRES[],
+    reviewRatingRange: { min: 0, max: 10 } as ReviewRatingRange,
     error: null as string | null,
   },
   reducers: {
     setFilteredMovies: (state, action) => {
       state.filteredItems = action.payload;
     },
-    setSearchTerm: (state, action) => {  // new reducer
+    setSearchTerm: (state, action) => {
       state.searchTerm = action.payload;
+    },
+    setSelectedGenres: (state, action) => {
+      state.selectedGenres = action.payload;
+    },
+    setReviewRatingRange: (state, action) => {
+      state.reviewRatingRange = action.payload;
     },
   },
   extraReducers: builder => {
@@ -68,7 +98,7 @@ const movieSlice = createSlice({
   },
 });
 
-export const { setFilteredMovies, setSearchTerm } = movieSlice.actions;
+export const { setFilteredMovies, setSearchTerm, setSelectedGenres, setReviewRatingRange } = movieSlice.actions;
 
 // Create the store
 const store = configureStore({

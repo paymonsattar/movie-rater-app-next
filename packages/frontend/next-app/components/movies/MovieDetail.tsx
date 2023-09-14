@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import NextImage from 'next/image';
 import { Movie } from '../../app/types';
-import { PLACEHOLDER_IMAGE } from '../../app/utils/placeholders';
+import { PLACEHOLDER_IMAGE } from '../../app/consts';
 import RatingComponent from './RatingComponent';
 
 interface MovieDetailProps {

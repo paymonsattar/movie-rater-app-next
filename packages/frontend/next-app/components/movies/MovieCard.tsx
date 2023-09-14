@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import NextImage from 'next/image';
 import Link from 'next/link';
 import { Movie } from '../../app/types';
-import { PLACEHOLDER_IMAGE } from '../../app/utils/placeholders';
+import { PLACEHOLDER_IMAGE } from '../../app/consts';
 
 interface MovieCardProps {
   movie: Movie;
