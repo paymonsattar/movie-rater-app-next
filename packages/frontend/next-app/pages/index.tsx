@@ -10,12 +10,10 @@ const IndexPage = () => {
         <Head>
           <title>Movie List</title>
         </Head>
-
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mt-20 mb-8 dark:text-white">
-          Movies
-        </h1>
-
-        <MovieCardList />
+        <div className="mt-24">
+          <MovieCardList />
+        </div>
+        
       </div>
     </Layout>
   );

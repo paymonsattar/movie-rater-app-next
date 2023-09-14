@@ -12,7 +12,8 @@ const MovieDetail = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const router = useRouter();
 
-  // Extract and convert id to string safely
+  // Use optional chaining and nullish coalescing to
+  // safely extract and convert id to string
   const id = useMemo(() => {
     return router.query?.id?.toString?.() ?? '';
   }, [router.query?.id]);

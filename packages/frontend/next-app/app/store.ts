@@ -28,30 +28,13 @@ export const fetchAllMovies = createAsyncThunk<
   }
 });
 
-export const searchMovies = () => (dispatch: AppDispatch, getState: () => RootState) => {
-  const { items: allMovies, selectedGenres, reviewRatingRange, searchTerm } = getState().movies;
+export const searchMovies = (term: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+  dispatch(setSearchTerm(term));
 
-  let filteredMovies = allMovies;
-
-  // Apply search term filter
-  if (searchTerm) {
-    filteredMovies = filteredMovies.filter(
-      movie => 
-        movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        movie.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
-
-  // Apply genre filter
-  if (selectedGenres.length > 0) {
-    filteredMovies = filteredMovies.filter(movie =>
-      selectedGenres.some(genre => movie.genres.includes(genre))
-    );
-  }
-
-  // Apply rating filter
-  filteredMovies = filteredMovies.filter(movie => 
-    movie.averageRating >= reviewRatingRange.min
+  const allMovies = getState().movies.items;
+  const filteredMovies = allMovies.filter(
+    movie => 
+      movie.title.toLowerCase().includes(term.toLowerCase())
   );
 
   dispatch(setFilteredMovies(filteredMovies));
