@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="flex justify-between items-center">
           <div className="text-sm">
-            &copy; {currentYear} MovieRater. All rights reserved.
+            &copy; {currentYear} MovieRater. Project by @paymonsattar
           </div>
           <div className="space-x-4 text-sm">
             <a href="/privacy-policy">Privacy Policy</a>

@@ -38,7 +38,7 @@ export const getReviews = async (movieId: string): Promise<Review[]> => {
   // TODO Replace with logger
   console.log('HTTP Response:', response);
 
-  return response.body as Review[];
+  return response.body.reviews as Review[];
 };
 
 /**

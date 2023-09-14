@@ -2,10 +2,10 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import NavBar from '../components/layout/NavBar';
 import Footer from '../components/layout/Footer';
-import store from './store';
+import store from '../app/store';
 
 // These styles apply to every route in the application
-import './global.css';
+import '../public/global.css';
 
 export default function RootLayout({
   children,

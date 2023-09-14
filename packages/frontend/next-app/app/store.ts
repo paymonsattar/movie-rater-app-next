@@ -22,14 +22,36 @@ export const fetchAllMovies = createAsyncThunk<
   }
 });
 
+export const searchMovies = (term: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+  dispatch(setSearchTerm(term));
+  
+  const allMovies = getState().movies.items;
+  const filteredMovies = allMovies.filter(
+    movie => 
+      movie.title.toLowerCase().includes(term.toLowerCase()) ||
+      movie.description.toLowerCase().includes(term.toLowerCase())
+  );
+  
+  dispatch(setFilteredMovies(filteredMovies));
+};
+
 const movieSlice = createSlice({
   name: 'movies',
   initialState: {
     items: [] as Movie[],
+    filteredItems: [] as Movie[],
     status: 'idle',
+    searchTerm: '' as string,
     error: null as string | null,
   },
-  reducers: {},
+  reducers: {
+    setFilteredMovies: (state, action) => {
+      state.filteredItems = action.payload;
+    },
+    setSearchTerm: (state, action) => {  // new reducer
+      state.searchTerm = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchAllMovies.pending, state => {
@@ -45,6 +67,8 @@ const movieSlice = createSlice({
       });
   },
 });
+
+export const { setFilteredMovies, setSearchTerm } = movieSlice.actions;
 
 // Create the store
 const store = configureStore({

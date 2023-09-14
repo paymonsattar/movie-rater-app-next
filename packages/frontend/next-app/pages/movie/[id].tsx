@@ -1,23 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Movie } from '../../app/types';
+import { Movie, Review } from '../../app/types';
 import MovieDetailComponent from '../../components/movies/MovieDetail';
-import RatingComponent from '../../components/movies/RatingComponent';
 import { getMovie } from '../../app/api/movies';
-import Layout from '../../app/layout';
+import { getReviews } from '../../app/api/reviews';
+import Layout from '../layout';
 
 const MovieDetail = () => {
   const [movie, setMovie] = useState<Movie>();
+  const [reviews, setReviews] = useState<Review[]>([]);
   const router = useRouter();
 
-  // Use optional chaining and nullish coalescing to safely extract and convert id to string
+  // Extract and convert id to string safely
   const id = useMemo(() => {
     return router.query?.id?.toString?.() ?? '';
   }, [router.query?.id]);
 
   useEffect(() => {
     fetchMovie();
+    fetchReviews();
   }, [id]);
 
   const fetchMovie = async () => {
@@ -28,15 +30,29 @@ const MovieDetail = () => {
 
     try {
       const fetchedMovie = await getMovie(id);
-      console.log('fetchedMovie', fetchedMovie);
       setMovie(fetchedMovie);
     } catch (err) {
       console.error(`Error fetching movie: ${id}`, err);
     }
   };
 
+  const fetchReviews = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const fetchedReviews = await getReviews(id);
+      
+      setReviews(fetchedReviews.filter(review => review.comment));
+    } catch (err) {
+      console.error(`Error fetching reviews: ${id}`, err);
+    }
+  };
+
   const onRatingSubmit = async () => {
     fetchMovie();
+    fetchReviews();
   };
 
   if (!movie) {
@@ -51,11 +67,27 @@ const MovieDetail = () => {
         </Head>
 
         <div className="flex flex-col md:flex-row mt-8">
-          <MovieDetailComponent movie={movie} />
+          <MovieDetailComponent movie={movie} onRatingSubmit={onRatingSubmit} />
         </div>
 
         <div className="mt-8">
-          <RatingComponent movie={movie} onRatingSubmit={onRatingSubmit} />
+          <h2 className="text-2xl font-semibold">Reviews:</h2>
+          <ul>
+            {reviews.length === 0 ? (
+              <p>No reviews with comments available.</p>
+            ) : (
+              reviews.map((review, index) => (
+                <li key={index} className="border-b border-gray-200 py-4">
+                  <div>
+                    <strong>Rating:</strong> {review.rating}
+                  </div>
+                  <div>
+                    <strong>Comment:</strong> {review.comment}
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
         </div>
       </div>
     </Layout>
