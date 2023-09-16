@@ -12,10 +12,17 @@ import {
   Review,
 } from '@movie-rater/backend-common';
 
+// 🧠 This module contains the handlers for managing movie reviews.
+// Each handler function is a higher-order function that takes a Redis client
+// and returns an Express middleware function.
+
+// 👇️ Handler for adding a new review
 export const addReview =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
+    // 🧠 Extracting necessary fields from the request body
     const { movieId, rating, comment } = req.body;
 
+    // 👇️ Validation block for required fields
     if (!movieId || rating === undefined || !comment) {
       return sendHttpResponse(
         res,
@@ -23,6 +30,7 @@ export const addReview =
       );
     }
 
+    // 🧠 Validating the type of movieId
     if (typeof movieId !== 'string') {
       return sendHttpResponse(
         res,
@@ -39,6 +47,7 @@ export const addReview =
     };
 
     try {
+      // 🧠 Using Redis lists to store reviews for each movie.
       await client.RPUSH(`reviews:${movieId}`, JSON.stringify(reviewData));
       return sendHttpResponse(
         res,
@@ -52,10 +61,14 @@ export const addReview =
     }
   };
 
+// 👇️ Handler for fetching reviews for a particular movie
 export const getReviews =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
+    // 🧠 Extracting movieId from request parameters
     const { movieId } = req.params;
 
+    // 🎯 TODO: Consider adding pagination for large sets of reviews
+    // 🧠 Validating the type of movieId
     if (typeof movieId !== 'string' && typeof movieId !== 'number') {
       return sendHttpResponse(
         res,
@@ -64,8 +77,9 @@ export const getReviews =
     }
 
     try {
+      // 👇️ Fetching reviews from Redis
       const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
-
+      // 🧠 Handling case where no reviews are found
       if (!reply || reply.length === 0) {
         return sendHttpResponse(
           res,
@@ -83,13 +97,17 @@ export const getReviews =
     }
   };
 
+// 👇️ Handler for fetching the average review rating for a particular movie
 export const getReviewAverage =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
+    // 🧠 Extracting movieId from request parameters
     const { movieId } = req.params;
 
     try {
+      // 👇️ Fetching reviews from Redis
       const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
 
+      // 🧠 Handling case where no reviews are found
       if (!reply || reply.length === 0) {
         return sendHttpResponse(
           res,
@@ -97,9 +115,9 @@ export const getReviewAverage =
         );
       }
 
+      // 🧠 Calculating the average rating in the application layer.
       const reviews = reply.map(review => {
         const parsedReview = JSON.parse(review);
-
         return parsedReview.rating;
       });
 

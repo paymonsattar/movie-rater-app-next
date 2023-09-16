@@ -37,9 +37,12 @@ describe('Movie Review API handlers tests', () => {
     res = mockResponse();
     mockRedisClient = redis.createClient();
 
-    // It seems like there is a type mismatch between the RedisClient from
-    // 'redis-mock: v3.0.2' and the RedisClient from 'redis: v4.6.8'. For now asserting
-    // the type here, as tests are running correctly.
+    // 🧠 Using redis-mock to simulate Redis operations in a testing environment.
+    // This allows for isolated unit tests without affecting a real Redis instance.
+
+    // 🧠 Type assertion is used here to align the Redis client types between the main application
+    // and the testing environment. This is necessary due to version differences between 'redis'
+    // and 'redis-mock'.
     redisClient = mockRedisClient as unknown as RedisClient;
   });
 
