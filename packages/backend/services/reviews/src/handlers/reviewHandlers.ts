@@ -45,9 +45,8 @@ export const addReview =
       rating,
       comment,
     };
-
     try {
-      // 🧠 Using Redis lists to store reviews for each movie.
+      // 👇️ Using Redis lists to store reviews for each movie.
       await client.RPUSH(`reviews:${movieId}`, JSON.stringify(reviewData));
       return sendHttpResponse(
         res,
@@ -64,14 +63,12 @@ export const addReview =
 // 👇️ Handler for fetching reviews for a particular movie
 export const getReviews =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
-    // 🧠 Extracting movieId from request parameters
     const { movieId } = req.params;
 
-    // 🎯 TODO: Consider adding pagination for large sets of reviews
     // 🧠 Validating the type of movieId
     if (typeof movieId !== 'string' && typeof movieId !== 'number') {
       return sendHttpResponse(
-        res,
+        res, // 🎯 TODO: Consider adding pagination for large sets of reviews
         BAD_REQUEST_RESPONSE('Invalid movieId format')
       );
     }
@@ -79,7 +76,6 @@ export const getReviews =
     try {
       // 👇️ Fetching reviews from Redis
       const reply = await client.LRANGE(`reviews:${movieId}`, 0, -1);
-      // 🧠 Handling case where no reviews are found
       if (!reply || reply.length === 0) {
         return sendHttpResponse(
           res,

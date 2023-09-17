@@ -20,6 +20,7 @@ const initialise = async () => {
   const port = 3002;
 
   // 🧠 Enabling CORS for localhost ports 4200 and 3000.
+  //
   // Port 4200: Next.js frontend
   // Port 3000: Movies REST API
   app.use(

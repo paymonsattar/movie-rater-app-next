@@ -4,12 +4,12 @@ import {
   addReview,
   getReviews,
   getReviewAverage,
-} from '../src/handlers/reviewHandlers'; // Replace with the actual module name
-import { RedisClient } from '../src/redisClient'; // Replace with the actual module name
+} from '../src/handlers/reviewHandlers';
+import { RedisClient } from '../src/redisClient';
 
 jest.mock('redis', () => redis);
 
-// Mocking the Response object
+// 👇️ Mocking the Response object
 const mockResponse = () => {
   const res: jest.Mocked<Response> = {
     status: jest.fn().mockReturnThis() as any,
@@ -18,7 +18,7 @@ const mockResponse = () => {
   return res;
 };
 
-// Mocking the Request object
+// 👇️ Mocking the Request object
 const mockRequest = (body: object, params: object): Request => {
   return {
     body,
@@ -39,10 +39,10 @@ describe('Movie Review API handlers tests', () => {
 
     // 🧠 Using redis-mock to simulate Redis operations in a testing environment.
     // This allows for isolated unit tests without affecting a real Redis instance.
-
+    //
     // 🧠 Type assertion is used here to align the Redis client types between the main application
     // and the testing environment. This is necessary due to version differences between 'redis'
-    // and 'redis-mock'.
+    // and the redis that 'redis-mock' relies upon.
     redisClient = mockRedisClient as unknown as RedisClient;
   });
 
@@ -60,7 +60,7 @@ describe('Movie Review API handlers tests', () => {
     });
 
     it('should return 500 if an error occurs', async () => {
-      // Simulate an error using Promises
+      // 👇️ Simulate an error using Promises
       mockRedisClient.RPUSH = jest
         .fn()
         .mockRejectedValue(new Error('Redis error'));
@@ -116,8 +116,8 @@ describe('Movie Review API handlers tests', () => {
     it('should allow duplicate reviews for the same movieId', async () => {
       req = mockRequest({ movieId: '1', review: '5' }, {});
 
-      await addReview(redisClient)(req, res); // First time
-      await addReview(redisClient)(req, res); // Second time
+      await addReview(redisClient)(req, res);
+      await addReview(redisClient)(req, res); // duplicate review
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(
@@ -148,7 +148,6 @@ describe('Movie Review API handlers tests', () => {
     });
   });
 
-  // getReviews test cases
   describe('getReviews', () => {
     it('should successfully get reviews', async () => {
       mockRedisClient.LRANGE = jest.fn().mockResolvedValue(['5', '4']);
@@ -196,7 +195,6 @@ describe('Movie Review API handlers tests', () => {
     });
   });
 
-  // getReviewAverage test cases
   describe('getReviewAverage', () => {
     it('should successfully get review average', async () => {
       mockRedisClient.LRANGE = jest.fn().mockResolvedValue(['5', '4']);
