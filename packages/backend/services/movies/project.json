@@ -18,7 +18,6 @@
         "assets": [
           {
             "input": "/packages/backend/services/movies",
-            "glob": "erik-sytnyk-movies-list.json",
             "output": "."
           }
         ],
