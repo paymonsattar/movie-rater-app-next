@@ -46,7 +46,6 @@ describe('Movie Review API handlers tests', () => {
     redisClient = mockRedisClient as unknown as RedisClient;
   });
 
-  // addReview test cases
   describe('addReview', () => {
     it('should successfully add a review', async () => {
       req = mockRequest({ movieId: '1', review: '5' }, {});

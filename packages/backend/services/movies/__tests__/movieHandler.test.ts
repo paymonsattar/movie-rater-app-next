@@ -4,12 +4,12 @@ import {
   createMovie,
   getMovieById,
   getAllMovies,
-} from '../../movies/src/handlers/movieHandlers'; // Replace with the actual module name
-import { RedisClient } from '../../movies/src/types'; // Replace with the actual module name
+} from '../../movies/src/handlers/movieHandlers';
+import { RedisClient } from '../src/redisClient';
 
 jest.mock('redis', () => redis);
 
-// Mocking the Response object
+// 👇️ Mocking the Response object
 const mockResponse = () => {
   const res: jest.Mocked<Response> = {
     status: jest.fn().mockReturnThis() as any,
@@ -18,7 +18,7 @@ const mockResponse = () => {
   return res;
 };
 
-// Mocking the Request object
+// 👇️ Mocking the Request object
 const mockRequest = (body: object, params: object): Request => {
   return {
     body,
@@ -37,9 +37,12 @@ describe('Movies API handlers tests', () => {
     res = mockResponse();
     mockRedisClient = redis.createClient();
 
-    // It seems like there is a type mismatch between the RedisClient from
-    // 'redis-mock: v3.0.2' and the RedisClient from 'redis: v4.6.8'. For now asserting
-    // the type here, as tests are running correctly.
+    // 🧠 Using redis-mock to simulate Redis operations in a testing environment.
+    // This allows for isolated unit tests without affecting a real Redis instance.
+    //
+    // 🧠 Type assertion is used here to align the Redis client types between the main application
+    // and the testing environment. This is necessary due to version differences between 'redis'
+    // and the redis that 'redis-mock' relies upon.
     redisClient = mockRedisClient as unknown as RedisClient;
   });
 
@@ -235,7 +238,7 @@ describe('Movies API handlers tests', () => {
 
   describe('getAllMovies', () => {
     it('should successfully get all movies', async () => {
-      // Mocking the Redis LRANGE function to return a list of movies
+      // 👇️ Mocking the Redis LRANGE function to return a list of movies
       mockRedisClient.LRANGE = jest
         .fn()
         .mockResolvedValue([
@@ -243,7 +246,7 @@ describe('Movies API handlers tests', () => {
           '{"id": "2", "title": "Movie2"}',
         ]);
 
-      // No parameters needed for this request
+      // 👇️ No parameters needed for this request
       req = mockRequest({}, {});
 
       await getAllMovies(redisClient)(req, res);
@@ -260,7 +263,7 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 500 if an error occurs', async () => {
-      // Mocking a Redis error
+      // 👇️ Mocking a Redis error
       mockRedisClient.LRANGE = jest
         .fn()
         .mockRejectedValue(new Error('Redis error'));
@@ -278,7 +281,7 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 404 if no movies are found', async () => {
-      // Mocking the Redis LRANGE function to return null
+      // 👇️ Mocking the Redis LRANGE function to return null
       mockRedisClient.LRANGE = jest.fn().mockResolvedValue(null);
 
       req = mockRequest({}, {});
@@ -296,7 +299,7 @@ describe('Movies API handlers tests', () => {
 
   describe('getMovieById', () => {
     it('should successfully get a movie by ID', async () => {
-      // Mocking Redis HGETALL function to return a movie
+      // 👇️ Mocking Redis HGETALL function to return a movie
       mockRedisClient.HGETALL = jest.fn().mockResolvedValue({
         id: '1',
         title: 'Movie1',
@@ -342,7 +345,7 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 404 for a nonexistent movie ID', async () => {
-      // Mocking the Redis HGETALL function to return null
+      // 👇️ Mocking the Redis HGETALL function to return null
       mockRedisClient.HGETALL = jest.fn().mockResolvedValue(null);
 
       req = mockRequest({}, { id: 'nonexistent' });

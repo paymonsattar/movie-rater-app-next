@@ -3,7 +3,16 @@ import express from 'express';
 import { createClient } from 'redis';
 import { createMovieReviewRoutes } from './routes/review';
 
-// 🧠 Initializing Redis client to serve as a fast, in-memory data store for movie reviews.
+/**
+ * 📚 Main server file for the Movie Reviews API.
+ * 
+ * This module initialises the Express server and sets up routes for managing movie reviews.
+ * It also initialises a Redis client to serve as a fast, in-memory data store for the reviews.
+ * 
+ * @module MainServer
+ */
+
+// 🧠 Initialising Redis client to serve as a fast, in-memory data store for movie reviews.
 // Chose Redis due to its high performance and support for list data structures.
 const client = createClient();
 
@@ -19,7 +28,7 @@ const initialise = async () => {
   const app = express();
   const port = 3002;
 
-  // 🧠 Enabling CORS for localhost ports 4200 and 3000.
+  // 👇️ Enabling CORS for localhost ports 4200 and 3000.
   //
   // Port 4200: Next.js frontend
   // Port 3000: Movies REST API

@@ -1,9 +1,19 @@
 import { Request, Response } from 'express';
 import { RedisClient } from '../redisClient';
 import { createMovie } from '../handlers/movieHandlers';
-// Had to directly import here as for some reason nx assets compilation wasn't working
+// 🧠 Had to directly import here as for some reason nx assets compilation wasn't working
 import erikSytnykMoviesList from '../assets/erik-sytnyk-movies-list.json';
 
+/**
+ * 📚 Populates the Redis database with a list of movies.
+ * 
+ * This function is designed to be a utility for seeding the database
+ * with initial data. It uses the 'createMovie' handler to ensure that
+ * movies are added in a manner consistent with how they would be added
+ * via the API.
+ * 
+ * @param client - The Redis client used to interact with the Redis database.
+ */
 export const populateMovies = async (client: RedisClient) => {
   try {
     const parsedMovies = erikSytnykMoviesList.movies;
@@ -20,8 +30,11 @@ export const populateMovies = async (client: RedisClient) => {
         moviePoster: movie.posterUrl,
       };
 
-      // Create mock Request and Response
-      const mockReq = {
+      // 🧠 Mocking the request object to simulate an API call to 'createMovie'.
+      // This allows us to reuse the 'createMovie' logic for adding movies,
+      // ensuring that the movies are added to the database in the same way
+      // they would be if added via the API.
+      const mockRequest = {
         body: movieData,
       } as Request;
 
@@ -31,13 +44,16 @@ export const populateMovies = async (client: RedisClient) => {
           return this;
         },
         json: function (data: any) {
-          // Do something with the data if needed
+          // 🎯 Do something with the data if needed
           // for now just returning it.
           return data;
         },
       } as unknown as Response;
 
-      await createMovie(client)(mockReq, res);
+      // 👇️ Invoking the 'createMovie' handler with the mock Request and Response objects.
+      // This effectively adds each movie to the Redis database, leveraging the existing
+      // logic in 'createMovie' to ensure consistency.
+      await createMovie(client)(mockRequest, res);
     }
   } catch (err) {
     console.error('Error populating movies:', err);
