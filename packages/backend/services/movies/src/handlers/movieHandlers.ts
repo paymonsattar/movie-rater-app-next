@@ -110,12 +110,30 @@ export const createMovie =
     } = req.body;
 
     // 🧠 Validating required fields to ensure data integrity
-    if (!title || !genres || !releaseDate || !description) {
+    if (!title || !genres || genres.length < 1 || !releaseDate || !description) {
       return sendHttpResponse(
         res,
         BAD_REQUEST_RESPONSE('title, description, genres, and releaseDate are required fields')
       );
     }
+
+    // 🧠 Type validation
+    if (typeof title !== 'string') {
+      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: title must be a string'));
+    }
+
+    if (!Array.isArray(genres)) {
+      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: genres must be an array'));
+    }
+
+    if (typeof releaseDate !== 'string') {
+      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: releaseDate must be a string'));
+    }
+
+    if (typeof moviePoster !== 'string') {
+      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: moviePoster must be a string'));
+    }
+
 
     const id = uuidv4();
     const movieData: Movie = {
@@ -141,6 +159,8 @@ export const createMovie =
       // 🧠 Using Redis' HSET and RPUSH for efficient data storage
       await client.HSET(`movies:${id}`, hsetObject);
       await client.RPUSH('allMovies', JSON.stringify(movieData));
+
+      const help = sendHttpResponse(res, CREATED_RESPONSE(movieData))
 
       return sendHttpResponse(res, CREATED_RESPONSE(movieData));
     } catch (error) {

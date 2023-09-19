@@ -48,33 +48,33 @@ describe('Movies API handlers tests', () => {
 
   describe('createMovie', () => {
     const mockUuid = '123e4567-e89b-12d3-a456-426614174000';
+    const mockMovie = {
+      title: 'Movie1',
+      genres: ['Action', 'Crime'],
+      description: 'A movie description',
+      director: 'John Doe',
+      runtime: 44,
+      releaseDate: '2022-09-05',
+      actors: ['actorA', 'actorB', 'actorC'],
+      moviePoster: 'url',
+    }
 
     it('should successfully create a movie', async () => {
       mockRedisClient.HSET = jest.fn().mockResolvedValue(1);
       mockRedisClient.RPUSH = jest.fn().mockResolvedValue(1);
 
-      req = mockRequest(
-        {
-          title: 'Movie1',
-          genre: 'Action',
-          releaseDate: '2022-09-05',
-          moviePoster: 'url',
-        },
-        {}
-      );
+      req = mockRequest(mockMovie, {});
 
       await createMovie(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         code: 201,
+        status: "success",
         body: expect.objectContaining({
-          title: 'Movie1',
-          genre: 'Action',
-          releaseDate: '2022-09-05',
-          moviePoster: 'url',
+          ...mockMovie,
+          id: expect.any(String),
         }),
-        status: 'success',
       });
     });
 
@@ -83,15 +83,7 @@ describe('Movies API handlers tests', () => {
         .fn()
         .mockRejectedValue(new Error('Redis error'));
 
-      req = mockRequest(
-        {
-          title: 'Movie1',
-          genre: 'Action',
-          releaseDate: '2022-09-05',
-          moviePoster: 'url',
-        },
-        {}
-      );
+      req = mockRequest(mockMovie, {});
 
       await createMovie(redisClient)(req, res);
 
@@ -105,7 +97,7 @@ describe('Movies API handlers tests', () => {
 
     it('should return 400 if title is missing', async () => {
       req = mockRequest(
-        { genre: 'Action', releaseDate: '2022-09-05', moviePoster: 'url' },
+        { ...mockMovie, title: null },
         {}
       );
 
@@ -114,14 +106,14 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'title, genre, and releaseDate are required fields',
+        message: 'title, description, genres, and releaseDate are required fields',
         status: 'error',
       });
     });
 
     it('should return 400 if genre is missing', async () => {
       req = mockRequest(
-        { title: 'Movie1', releaseDate: '2022-09-05', moviePoster: 'url' },
+        { ...mockMovie, genres: [] },
         {}
       );
 
@@ -130,14 +122,14 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'title, genre, and releaseDate are required fields',
+        message: 'title, description, genres, and releaseDate are required fields',
         status: 'error',
       });
     });
 
     it('should return 400 if releaseDate is missing', async () => {
       req = mockRequest(
-        { title: 'Movie1', genre: 'Action', moviePoster: 'url' },
+        { ...mockMovie, releaseDate: null },
         {}
       );
 
@@ -146,19 +138,14 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'title, genre, and releaseDate are required fields',
+        message: 'title, description, genres, and releaseDate are required fields',
         status: 'error',
       });
     });
 
     it('should return 400 for invalid title format', async () => {
       req = mockRequest(
-        {
-          title: {},
-          genre: 'Action',
-          releaseDate: '2022-09-05',
-          moviePoster: 'url',
-        },
+        { ...mockMovie, title: {}},
         {}
       );
 
@@ -167,19 +154,14 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'Invalid data types: title and genre must be strings',
+        message: 'Invalid data type: title must be a string',
         status: 'error',
       });
     });
 
-    it('should return 400 for invalid genre format', async () => {
+    it('should return 400 for invalid genres format', async () => {
       req = mockRequest(
-        {
-          title: 'Movie1',
-          genre: {},
-          releaseDate: '2022-09-05',
-          moviePoster: 'url',
-        },
+        { ...mockMovie, genres: {}},
         {}
       );
 
@@ -188,19 +170,14 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'Invalid data types: title and genre must be strings',
+        message: 'Invalid data type: genres must be an array',
         status: 'error',
       });
     });
 
     it('should return 400 for invalid releaseDate format', async () => {
       req = mockRequest(
-        {
-          title: 'Movie1',
-          genre: 'Action',
-          releaseDate: {},
-          moviePoster: 'url',
-        },
+        { ...mockMovie, releaseDate: {} },
         {}
       );
 
@@ -209,19 +186,14 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'Invalid data type: releaseDate must be a date type',
+        message: 'Invalid data type: releaseDate must be a string',
         status: 'error',
       });
     });
 
     it('should return 400 for invalid moviePoster format', async () => {
       req = mockRequest(
-        {
-          title: 'Movie1',
-          genre: 'Action',
-          releaseDate: '2022-09-05',
-          moviePoster: {},
-        },
+        { ...mockMovie, moviePoster: {} },
         {}
       );
 
@@ -255,8 +227,8 @@ describe('Movies API handlers tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         code: 200,
         body: [
-          { id: '1', title: 'Movie1' },
-          { id: '2', title: 'Movie2' },
+          { id: '1', title: 'Movie1', averageRating: 0 },
+          { id: '2', title: 'Movie2', averageRating: 0 },
         ],
         status: 'success',
       });
@@ -321,6 +293,7 @@ describe('Movies API handlers tests', () => {
           genre: 'Action',
           releaseDate: '2022-09-05',
           moviePoster: 'url',
+          averageRating: 0,
         },
         status: 'success',
       });
