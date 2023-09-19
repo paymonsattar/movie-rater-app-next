@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { RedisClient } from '../redisClient';
 import { createMovie } from '../handlers/movieHandlers';
 // 🧠 Had to directly import here as for some reason nx assets compilation wasn't working
-import erikSytnykMoviesList from '../assets/erik-sytnyk-movies-list.json';
+import erikSytnykMoviesList from '../../erik-sytnyk-movies-list.json';
 
 /**
  * 📚 Populates the Redis database with a list of movies.
