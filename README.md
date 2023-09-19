@@ -34,7 +34,7 @@ This project allows for anonymous movie ratings and reviews. Built using a Monor
 
 ## Prerequisites
 
-Before deploying any REST APIs, it's essential to have a Redis server up and running. You can find a guide on setting up a Redis server and CLI on macOS [here](https://redis.io/docs/getting-started/installation/install-redis-on-mac-os/).
+Before deploying any REST APIs, it's essential to have a Redis server up and running. Here is a guide to install and configure Redis [here](https://redis.io/docs/getting-started/). Once Redis is installed, run the ```redis-server``` command on your command line. 
 
 ## Project Structure
 
