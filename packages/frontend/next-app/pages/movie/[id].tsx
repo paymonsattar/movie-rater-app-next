@@ -44,7 +44,7 @@ const MovieDetail = () => {
 
     try {
       const fetchedReviews = await getReviews(id);
-      
+
       setReviews(fetchedReviews.filter(review => review.comment));
     } catch (err) {
       console.error(`Error fetching reviews: ${id}`, err);

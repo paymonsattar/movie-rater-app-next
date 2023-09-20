@@ -6,12 +6,12 @@ import erikSytnykMoviesList from '../../erik-sytnyk-movies-list.json';
 
 /**
  * 📚 Populates the Redis database with a list of movies.
- * 
+ *
  * This function is designed to be a utility for seeding the database
  * with initial data. It uses the 'createMovie' handler to ensure that
  * movies are added in a manner consistent with how they would be added
  * via the API.
- * 
+ *
  * @param client - The Redis client used to interact with the Redis database.
  */
 export const populateMovies = async (client: RedisClient) => {

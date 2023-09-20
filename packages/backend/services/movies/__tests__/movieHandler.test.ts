@@ -56,7 +56,7 @@ describe('Movies API handlers tests', () => {
       releaseDate: '2022-09-05',
       actors: ['actorA', 'actorB', 'actorC'],
       moviePoster: 'url',
-    }
+    };
 
     it('should successfully create a movie', async () => {
       mockRedisClient.HSET = jest.fn().mockResolvedValue(1);
@@ -69,7 +69,7 @@ describe('Movies API handlers tests', () => {
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         code: 201,
-        status: "success",
+        status: 'success',
         body: expect.objectContaining({
           ...mockMovie,
           id: expect.any(String),
@@ -95,58 +95,49 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 400 if title is missing', async () => {
-      req = mockRequest(
-        { ...mockMovie, title: null },
-        {}
-      );
+      req = mockRequest({ ...mockMovie, title: null }, {});
 
       await createMovie(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'title, description, genres, and releaseDate are required fields',
+        message:
+          'title, description, genres, and releaseDate are required fields',
         status: 'error',
       });
     });
 
     it('should return 400 if genre is missing', async () => {
-      req = mockRequest(
-        { ...mockMovie, genres: [] },
-        {}
-      );
+      req = mockRequest({ ...mockMovie, genres: [] }, {});
 
       await createMovie(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'title, description, genres, and releaseDate are required fields',
+        message:
+          'title, description, genres, and releaseDate are required fields',
         status: 'error',
       });
     });
 
     it('should return 400 if releaseDate is missing', async () => {
-      req = mockRequest(
-        { ...mockMovie, releaseDate: null },
-        {}
-      );
+      req = mockRequest({ ...mockMovie, releaseDate: null }, {});
 
       await createMovie(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         code: 400,
-        message: 'title, description, genres, and releaseDate are required fields',
+        message:
+          'title, description, genres, and releaseDate are required fields',
         status: 'error',
       });
     });
 
     it('should return 400 for invalid title format', async () => {
-      req = mockRequest(
-        { ...mockMovie, title: {}},
-        {}
-      );
+      req = mockRequest({ ...mockMovie, title: {} }, {});
 
       await createMovie(redisClient)(req, res);
 
@@ -159,10 +150,7 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 400 for invalid genres format', async () => {
-      req = mockRequest(
-        { ...mockMovie, genres: {}},
-        {}
-      );
+      req = mockRequest({ ...mockMovie, genres: {} }, {});
 
       await createMovie(redisClient)(req, res);
 
@@ -175,10 +163,7 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 400 for invalid releaseDate format', async () => {
-      req = mockRequest(
-        { ...mockMovie, releaseDate: {} },
-        {}
-      );
+      req = mockRequest({ ...mockMovie, releaseDate: {} }, {});
 
       await createMovie(redisClient)(req, res);
 
@@ -191,10 +176,7 @@ describe('Movies API handlers tests', () => {
     });
 
     it('should return 400 for invalid moviePoster format', async () => {
-      req = mockRequest(
-        { ...mockMovie, moviePoster: {} },
-        {}
-      );
+      req = mockRequest({ ...mockMovie, moviePoster: {} }, {});
 
       await createMovie(redisClient)(req, res);
 

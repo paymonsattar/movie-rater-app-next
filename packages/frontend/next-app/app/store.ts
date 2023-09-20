@@ -3,7 +3,7 @@ import {
   createAsyncThunk,
   configureStore,
   ThunkAction,
-  Action
+  Action,
 } from '@reduxjs/toolkit';
 import { getAllMovies, IResponse } from '../app/api/movies';
 import { Movie } from './types';
@@ -28,17 +28,17 @@ export const fetchAllMovies = createAsyncThunk<
   }
 });
 
-export const searchMovies = (term: string) => (dispatch: AppDispatch, getState: () => RootState) => {
-  dispatch(setSearchTerm(term));
+export const searchMovies =
+  (term: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(setSearchTerm(term));
 
-  const allMovies = getState().movies.items;
-  const filteredMovies = allMovies.filter(
-    movie => 
+    const allMovies = getState().movies.items;
+    const filteredMovies = allMovies.filter(movie =>
       movie.title.toLowerCase().includes(term.toLowerCase())
-  );
+    );
 
-  dispatch(setFilteredMovies(filteredMovies));
-};
+    dispatch(setFilteredMovies(filteredMovies));
+  };
 
 const movieSlice = createSlice({
   name: 'movies',
@@ -81,7 +81,12 @@ const movieSlice = createSlice({
   },
 });
 
-export const { setFilteredMovies, setSearchTerm, setSelectedGenres, setReviewRatingRange } = movieSlice.actions;
+export const {
+  setFilteredMovies,
+  setSearchTerm,
+  setSelectedGenres,
+  setReviewRatingRange,
+} = movieSlice.actions;
 
 // Create the store
 const store = configureStore({
@@ -92,6 +97,11 @@ const store = configureStore({
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
-export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 
 export default store;

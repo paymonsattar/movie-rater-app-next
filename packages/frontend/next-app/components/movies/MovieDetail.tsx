@@ -53,7 +53,10 @@ const MovieDetail = ({ movie, onRatingSubmit }: MovieDetailProps) => {
           </div>
           <div className="flex flex-wrap mb-4">
             {genres.map((genre, index) => (
-              <span key={index} className="m-1 p-2 rounded-lg bg-gray-600 text-white text-md">
+              <span
+                key={index}
+                className="m-1 p-2 rounded-lg bg-gray-600 text-white text-md"
+              >
                 {genre}
               </span>
             ))}

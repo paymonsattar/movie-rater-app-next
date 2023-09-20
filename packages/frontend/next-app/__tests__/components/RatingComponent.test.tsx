@@ -19,7 +19,7 @@ describe('Rating Component', () => {
     nock.disableNetConnect();
     // Only localhost connections can now be made
     nock.enableNetConnect('127.0.0.1');
-  })
+  });
 
   beforeEach(() => {
     render(<Rating movie={mockMovie} onRatingSubmit={mockOnRatingSubmit} />);
@@ -28,7 +28,7 @@ describe('Rating Component', () => {
   afterAll(() => {
     nock.restore();
     nock.cleanAll();
-    nock.enableNetConnect(); 
+    nock.enableNetConnect();
   });
 
   it('Should render a list of clickable star icons.', () => {
@@ -69,13 +69,13 @@ describe('Rating Component', () => {
 
   it('Should trigger an update in the backend when the Submit button is clicked.', async () => {
     nock('http://localhost:3002')
-    .defaultReplyHeaders(nockCORSHeaders)
-    .post('/reviews/', {
-      movieId: "test-movie-id",
-      rating: 1,
-      comment: "",
-    })
-    .reply(200, {});
+      .defaultReplyHeaders(nockCORSHeaders)
+      .post('/reviews/', {
+        movieId: 'test-movie-id',
+        rating: 1,
+        comment: '',
+      })
+      .reply(200, {});
 
     const submitButton = screen.getByText(/Submit/i);
     userEvent.click(submitButton);

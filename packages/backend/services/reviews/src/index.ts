@@ -5,10 +5,10 @@ import { createMovieReviewRoutes } from './routes/review';
 
 /**
  * 📚 Main server file for the Movie Reviews API.
- * 
+ *
  * This module initialises the Express server and sets up routes for managing movie reviews.
  * It also initialises a Redis client to serve as a fast, in-memory data store for the reviews.
- * 
+ *
  * @module MainServer
  */
 
@@ -34,10 +34,7 @@ const initialise = async () => {
   // Port 3000: Movies REST API
   app.use(
     cors({
-      origin: [
-        'http://localhost:4200',
-        'http://localhost:3000',
-      ],
+      origin: ['http://localhost:4200', 'http://localhost:3000'],
     })
   );
 

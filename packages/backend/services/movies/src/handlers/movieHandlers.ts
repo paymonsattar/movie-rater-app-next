@@ -15,15 +15,15 @@ import {
 
 /**
  * 📚 This module contains the handlers for managing movies in the application.
- * 
+ *
  * Each handler function is a higher-order function that takes a Redis client
  * and returns an Express middleware function. The handlers are responsible for
  * the following functionalities:
- * 
+ *
  * - `getAllMovies`: Fetches all movies from the database and calculates their average ratings.
  * - `getMovieById`: Fetches a single movie by its ID from the database.
  * - `createMovie`: Adds a new movie to the database.
- * 
+ *
  * @module MovieHandlers
  */
 
@@ -31,7 +31,9 @@ import {
 // This is done to keep the concerns of rating and movie data separate.
 const fetchAverageRating = async (movieId: string) => {
   try {
-    const response = await axios.get(`http://localhost:3002/reviews/${movieId}/average`);
+    const response = await axios.get(
+      `http://localhost:3002/reviews/${movieId}/average`
+    );
     return response.data.body.average;
   } catch (error) {
     return 0; // 🧠 Default to 0 if the review service fails
@@ -62,7 +64,10 @@ export const getAllMovies =
 
       return sendHttpResponse(res, OK_RESPONSE(parsedMovies));
     } catch (error) {
-      return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movies'));
+      return sendHttpResponse(
+        res,
+        INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movies')
+      );
     }
   };
 
@@ -71,7 +76,10 @@ export const getMovieById =
   (client: RedisClient) => async (req: Request, res: Response<IResponse>) => {
     const { id } = req.params;
     if (typeof id !== 'string') {
-      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid movie ID format'));
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid movie ID format')
+      );
     }
 
     try {
@@ -91,7 +99,10 @@ export const getMovieById =
 
       return sendHttpResponse(res, OK_RESPONSE(movie));
     } catch (error) {
-      return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movie'));
+      return sendHttpResponse(
+        res,
+        INTERNAL_SERVER_ERROR_RESPONSE('Error fetching movie')
+      );
     }
   };
 
@@ -110,30 +121,49 @@ export const createMovie =
     } = req.body;
 
     // 🧠 Validating required fields to ensure data integrity
-    if (!title || !genres || genres.length < 1 || !releaseDate || !description) {
+    if (
+      !title ||
+      !genres ||
+      genres.length < 1 ||
+      !releaseDate ||
+      !description
+    ) {
       return sendHttpResponse(
         res,
-        BAD_REQUEST_RESPONSE('title, description, genres, and releaseDate are required fields')
+        BAD_REQUEST_RESPONSE(
+          'title, description, genres, and releaseDate are required fields'
+        )
       );
     }
 
     // 🧠 Type validation
     if (typeof title !== 'string') {
-      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: title must be a string'));
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid data type: title must be a string')
+      );
     }
 
     if (!Array.isArray(genres)) {
-      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: genres must be an array'));
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid data type: genres must be an array')
+      );
     }
 
     if (typeof releaseDate !== 'string') {
-      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: releaseDate must be a string'));
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid data type: releaseDate must be a string')
+      );
     }
 
     if (typeof moviePoster !== 'string') {
-      return sendHttpResponse(res, BAD_REQUEST_RESPONSE('Invalid data type: moviePoster must be a string'));
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid data type: moviePoster must be a string')
+      );
     }
-
 
     const id = uuidv4();
     const movieData: Movie = {
@@ -152,7 +182,8 @@ export const createMovie =
     type HSETObject = Record<string, string | number>;
     const hsetObject: HSETObject = {};
     for (const [key, value] of Object.entries(movieData)) {
-      hsetObject[key] = typeof value === 'object' ? JSON.stringify(value) : value;
+      hsetObject[key] =
+        typeof value === 'object' ? JSON.stringify(value) : value;
     }
 
     try {
@@ -160,10 +191,13 @@ export const createMovie =
       await client.HSET(`movies:${id}`, hsetObject);
       await client.RPUSH('allMovies', JSON.stringify(movieData));
 
-      const help = sendHttpResponse(res, CREATED_RESPONSE(movieData))
+      const help = sendHttpResponse(res, CREATED_RESPONSE(movieData));
 
       return sendHttpResponse(res, CREATED_RESPONSE(movieData));
     } catch (error) {
-      return sendHttpResponse(res, INTERNAL_SERVER_ERROR_RESPONSE('Error creating movie'));
+      return sendHttpResponse(
+        res,
+        INTERNAL_SERVER_ERROR_RESPONSE('Error creating movie')
+      );
     }
   };

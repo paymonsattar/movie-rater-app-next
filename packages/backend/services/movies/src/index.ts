@@ -6,10 +6,10 @@ import { populateMovies } from './utils/populateMovies';
 
 /**
  * 📚 Main server file for the Movie API.
- * 
+ *
  * This module initialises the Express server and sets up routes for managing movies.
  * It also initialises a Redis client to serve as a fast, in-memory data store for the movies.
- * 
+ *
  * @module MainServer
  */
 

@@ -8,7 +8,7 @@ import * as handlers from '../handlers/reviewHandlers';
  * POST /reviews: Adds a new review
  * GET /reviews/:movieId: Retrieves reviews for a specific movie
  * GET /reviews/:movieId/average: Retrieves the average rating for a specific movie
- * 
+ *
  * @module MovieRoutes
  */
 export const createMovieReviewRoutes = (client: RedisClient) => {
@@ -21,4 +21,3 @@ export const createMovieReviewRoutes = (client: RedisClient) => {
 
   return router;
 };
-

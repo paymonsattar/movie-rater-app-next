@@ -33,10 +33,10 @@ describe('Movie Review API handlers tests', () => {
   let redisClient: RedisClient;
 
   const mockReview = {
-   movieId: '1',
-   rating: 5,
-   comment: 'mock comment' 
-  }
+    movieId: '1',
+    rating: 5,
+    comment: 'mock comment',
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -57,7 +57,7 @@ describe('Movie Review API handlers tests', () => {
       req = mockRequest(mockReview, {});
 
       await addReview(redisClient)(req, res);
-      
+
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         code: 201,
@@ -152,13 +152,13 @@ describe('Movie Review API handlers tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         code: 201,
         status: 'success',
-        body: { 
+        body: {
           message: 'Review added',
           review: expect.objectContaining({
             ...mockReview,
             id: expect.any(String),
-          })
-        }
+          }),
+        },
       });
     });
 
@@ -191,10 +191,12 @@ describe('Movie Review API handlers tests', () => {
 
   describe('getReviews', () => {
     it('should successfully get reviews', async () => {
-      mockRedisClient.LRANGE = jest.fn().mockResolvedValue([
-         JSON.stringify({ ...mockReview, rating: 4 }),
-         JSON.stringify({ ...mockReview, rating: 5 }),
-      ]);
+      mockRedisClient.LRANGE = jest
+        .fn()
+        .mockResolvedValue([
+          JSON.stringify({ ...mockReview, rating: 4 }),
+          JSON.stringify({ ...mockReview, rating: 5 }),
+        ]);
 
       req = mockRequest({}, { movieId: '1' });
 
@@ -208,7 +210,7 @@ describe('Movie Review API handlers tests', () => {
           reviews: [
             { ...mockReview, rating: 4 },
             { ...mockReview, rating: 5 },
-          ]
+          ],
         },
       });
     });
@@ -259,10 +261,12 @@ describe('Movie Review API handlers tests', () => {
 
   describe('getReviewAverage', () => {
     it('should successfully get review average', async () => {
-      mockRedisClient.LRANGE = jest.fn().mockResolvedValue([
-         JSON.stringify({ ...mockReview, rating: 4 }),
-         JSON.stringify({ ...mockReview, rating: 5 }),
-      ]);
+      mockRedisClient.LRANGE = jest
+        .fn()
+        .mockResolvedValue([
+          JSON.stringify({ ...mockReview, rating: 4 }),
+          JSON.stringify({ ...mockReview, rating: 5 }),
+        ]);
       req = mockRequest({}, { movieId: '1' });
 
       await getReviewAverage(redisClient)(req, res);

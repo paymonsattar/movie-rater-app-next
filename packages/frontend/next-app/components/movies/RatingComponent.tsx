@@ -8,7 +8,7 @@ interface RatingProps {
 }
 
 const Rating = ({ movie, onRatingSubmit }: RatingProps) => {
-  const DEFAULT_RATING = 1;  // Changed to 0 so that no star is highlighted by default
+  const DEFAULT_RATING = 1; // Changed to 0 so that no star is highlighted by default
   const DEFAULT_COMMENT = '';
 
   const [hoverRating, setHoverRating] = useState(DEFAULT_RATING);

@@ -13,7 +13,6 @@ const IndexPage = () => {
         <div className="mt-24">
           <MovieCardList />
         </div>
-        
       </div>
     </Layout>
   );
