@@ -6,9 +6,13 @@ import Rating from '../../components/movies/RatingComponent'; // Adjust the impo
 import { mockMovie, nockCORSHeaders } from '../resources/mockTypes';
 import nock from 'nock';
 
+jest.mock('../../app/api/reviews', () => ({
+  mockOnRatingSubmit: jest.fn(() => Promise.resolve()),
+  addReview: jest.fn(() => Promise.resolve()),
+}));
 
-const mockOnRatingSubmit = jest.fn(() => Promise.resolve());
-const mockAddReview = jest.fn(() => Promise.resolve());
+const mockOnRatingSubmit = require('../../app/api/reviews').mockOnRatingSubmit;
+const mockAddReview = require('../../app/api/reviews').addReview;
 
 describe('Rating Component', () => {
   beforeAll(() => {

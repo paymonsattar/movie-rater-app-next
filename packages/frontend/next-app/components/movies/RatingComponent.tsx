@@ -47,8 +47,7 @@ const Rating = ({ movie, onRatingSubmit }: RatingProps) => {
     await addReview(newReview);
     await onRatingSubmit();
 
-    setSelectedRating(DEFAULT_RATING);
-    setComment(DEFAULT_COMMENT);
+    handleReset();
   };
 
   const handleReset = () => {
