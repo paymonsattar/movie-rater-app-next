@@ -28,21 +28,28 @@ export const addReview =
   // 🧠 Extracting necessary fields from the request body
   const { movieId, rating, comment } = req.body;
 
-  // 👇️ Validation block for required fields
-  if (!movieId || rating === undefined || !comment) {
-    return sendHttpResponse(
-      res,
-      BAD_REQUEST_RESPONSE('movieId, rating, and comment are required fields')
-    );
-  }
+    // 👇️ Validation block for required fields
+    if (!movieId || !rating) {
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('movieId and rating are required fields')
+      );
+    }
 
-  // 🧠 Validating the type of movieId
-  if (typeof movieId !== 'string') {
-    return sendHttpResponse(
-      res,
-      BAD_REQUEST_RESPONSE('Invalid movieId format')
-    );
-  }
+    // 🧠 Validating the type of movieId
+    if (typeof movieId !== 'string') {
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid movieId format')
+      );
+    }
+
+    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+      return sendHttpResponse(
+        res,
+        BAD_REQUEST_RESPONSE('Invalid review value, must be between 0 and 5')
+      );
+    }
 
   const id = uuidv4();
   const reviewData: Review = {

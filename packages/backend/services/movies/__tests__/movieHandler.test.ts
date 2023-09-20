@@ -47,7 +47,6 @@ describe('Movies API handlers tests', () => {
   });
 
   describe('createMovie', () => {
-    const mockUuid = '123e4567-e89b-12d3-a456-426614174000';
     const mockMovie = {
       title: 'Movie1',
       genres: ['Action', 'Crime'],

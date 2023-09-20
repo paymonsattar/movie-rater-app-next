@@ -32,6 +32,12 @@ describe('Movie Review API handlers tests', () => {
   let mockRedisClient: ReturnType<typeof redis.createClient>;
   let redisClient: RedisClient;
 
+  const mockReview = {
+   movieId: '1',
+   rating: 5,
+   comment: 'mock comment' 
+  }
+
   beforeEach(() => {
     jest.clearAllMocks();
     res = mockResponse();
@@ -48,14 +54,22 @@ describe('Movie Review API handlers tests', () => {
 
   describe('addReview', () => {
     it('should successfully add a review', async () => {
-      req = mockRequest({ movieId: '1', review: '5' }, {});
+      req = mockRequest(mockReview, {});
 
       await addReview(redisClient)(req, res);
-
+      
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'Review added' })
-      );
+      expect(res.json).toHaveBeenCalledWith({
+        code: 201,
+        status: 'success',
+        body: {
+          message: 'Review added',
+          review: expect.objectContaining({
+            ...mockReview,
+            id: expect.any(String),
+          }),
+        },
+      });
     });
 
     it('should return 500 if an error occurs', async () => {
@@ -64,98 +78,139 @@ describe('Movie Review API handlers tests', () => {
         .fn()
         .mockRejectedValue(new Error('Redis error'));
 
-      req = mockRequest({ movieId: '1', review: '5' }, {});
+      req = mockRequest(mockReview, {});
 
       await addReview(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Redis error' });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 500,
+        message: 'Redis error',
+        status: 'error',
+      });
     });
 
     it('should return 400 if movieId is missing', async () => {
-      req = mockRequest({ review: '5' }, {});
-
-      await addReview(redisClient)(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'movieId is required' });
-    });
-
-    it('should return 400 if review is missing', async () => {
-      req = mockRequest({ movieId: '1' }, {});
-
-      await addReview(redisClient)(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'review is required' });
-    });
-
-    it('should return 400 if review is below 0', async () => {
-      req = mockRequest({ movieId: '1', review: '-1' }, {});
+      req = mockRequest({ ...mockReview, movieId: null }, {});
 
       await addReview(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid review value, must be between 0 and 5',
+        code: 400,
+        message: 'movieId and rating are required fields',
+        status: 'error',
+      });
+    });
+
+    it('should return 400 if review is missing', async () => {
+      req = mockRequest({ ...mockReview, rating: null }, {});
+
+      await addReview(redisClient)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        code: 400,
+        message: 'movieId and rating are required fields',
+        status: 'error',
+      });
+    });
+
+    it('should return 400 if review is below 0', async () => {
+      req = mockRequest({ ...mockReview, rating: -1 }, {});
+
+      await addReview(redisClient)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        code: 400,
+        message: 'Invalid review value, must be between 0 and 5',
+        status: 'error',
       });
     });
 
     it('should return 400 if review is above 5', async () => {
-      req = mockRequest({ movieId: '1', review: '6' }, {});
+      req = mockRequest({ ...mockReview, rating: 6 }, {});
 
       await addReview(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid review value, must be between 0 and 5',
+        code: 400,
+        message: 'Invalid review value, must be between 0 and 5',
+        status: 'error',
       });
     });
 
     it('should allow duplicate reviews for the same movieId', async () => {
-      req = mockRequest({ movieId: '1', review: '5' }, {});
+      req = mockRequest({ ...mockReview }, {});
 
       await addReview(redisClient)(req, res);
       await addReview(redisClient)(req, res); // duplicate review
 
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'Review added' })
-      );
+      expect(res.json).toHaveBeenCalledWith({
+        code: 201,
+        status: 'success',
+        body: { 
+          message: 'Review added',
+          review: expect.objectContaining({
+            ...mockReview,
+            id: expect.any(String),
+          })
+        }
+      });
     });
 
     it('should return 400 for invalid movieId format', async () => {
-      req = mockRequest({ movieId: {}, review: '5' }, {});
+      req = mockRequest({ ...mockReview, movieId: {} }, {});
 
       await addReview(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid movieId format',
+        code: 400,
+        message: 'Invalid movieId format',
+        status: 'error',
       });
     });
 
     it('should return 400 for invalid review format', async () => {
-      req = mockRequest({ movieId: '1', review: {} }, {});
+      req = mockRequest({ ...mockReview, rating: {} }, {});
 
       await addReview(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid review value, must be between 0 and 5',
+        code: 400,
+        message: 'Invalid review value, must be between 0 and 5',
+        status: 'error',
       });
     });
   });
 
   describe('getReviews', () => {
     it('should successfully get reviews', async () => {
-      mockRedisClient.LRANGE = jest.fn().mockResolvedValue(['5', '4']);
+      mockRedisClient.LRANGE = jest.fn().mockResolvedValue([
+         JSON.stringify({ ...mockReview, rating: 4 }),
+         JSON.stringify({ ...mockReview, rating: 5 }),
+      ]);
+
       req = mockRequest({}, { movieId: '1' });
 
       await getReviews(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ reviews: ['5', '4'] });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 200,
+        status: 'success',
+        body: {
+          reviews: [
+            { ...mockReview, rating: 4 },
+            { ...mockReview, rating: 5 },
+          ]
+        },
+      });
     });
 
     it('should return 500 if an error occurs', async () => {
@@ -167,7 +222,11 @@ describe('Movie Review API handlers tests', () => {
       await getReviews(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Redis error' });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 500,
+        status: 'error',
+        message: 'Redis error',
+      });
     });
 
     it('should return 404 for nonexistent movieId', async () => {
@@ -178,7 +237,9 @@ describe('Movie Review API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'No reviews found for this movieId',
+        code: 404,
+        status: 'error',
+        message: 'No reviews found for this movieId',
       });
     });
 
@@ -189,20 +250,31 @@ describe('Movie Review API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Invalid movieId format',
+        code: 400,
+        status: 'error',
+        message: 'Invalid movieId format',
       });
     });
   });
 
   describe('getReviewAverage', () => {
     it('should successfully get review average', async () => {
-      mockRedisClient.LRANGE = jest.fn().mockResolvedValue(['5', '4']);
+      mockRedisClient.LRANGE = jest.fn().mockResolvedValue([
+         JSON.stringify({ ...mockReview, rating: 4 }),
+         JSON.stringify({ ...mockReview, rating: 5 }),
+      ]);
       req = mockRequest({}, { movieId: '1' });
 
       await getReviewAverage(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ average: 4.5 });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 200,
+        body: {
+          average: 4.5,
+        },
+        status: 'success',
+      });
     });
 
     it('should return 500 if an error occurs', async () => {
@@ -214,7 +286,11 @@ describe('Movie Review API handlers tests', () => {
       await getReviewAverage(redisClient)(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Redis error' });
+      expect(res.json).toHaveBeenCalledWith({
+        code: 500,
+        message: 'Redis error',
+        status: 'error',
+      });
     });
 
     it('should return 404 if movieId has no reviews', async () => {
@@ -225,7 +301,9 @@ describe('Movie Review API handlers tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'No reviews found for this movieId',
+        code: 404,
+        message: 'No reviews found for this movieId',
+        status: 'error',
       });
     });
   });
