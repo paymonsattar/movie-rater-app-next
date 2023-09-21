@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, getAllByTestId } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MovieCard from '../../components/movies/MovieCard';
 import { useRouter } from 'next/router';

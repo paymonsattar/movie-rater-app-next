@@ -1,6 +1,7 @@
 import { Review } from '../types';
 import { httpRequest } from '../utils/apiUtil';
 
+// TODO create as env var
 const baseUrl = 'http://localhost:3002/reviews';
 
 // TODO move this to frontend-common

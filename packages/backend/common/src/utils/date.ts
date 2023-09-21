@@ -4,7 +4,7 @@ import moment from 'moment';
 // Useful for ensuring date consistency across various parts of the application.
 export const formatDate = (
   date: Date,
-  format: string = 'YYYY-MM-DD'
+  format = 'YYYY-MM-DD'
 ): string => {
   return moment(date).format(format);
 };
@@ -13,7 +13,7 @@ export const formatDate = (
 // Useful for converting client-provided date strings into Date objects that can be used in the application.
 export const parseDate = (
   dateString: string,
-  format: string = 'YYYY-MM-DD'
+  format = 'YYYY-MM-DD'
 ): Date => {
   return moment.utc(dateString, format).toDate();
 };

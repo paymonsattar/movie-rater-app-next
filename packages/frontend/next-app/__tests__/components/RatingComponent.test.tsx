@@ -11,7 +11,9 @@ jest.mock('../../app/api/reviews', () => ({
   addReview: jest.fn(() => Promise.resolve()),
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockOnRatingSubmit = require('../../app/api/reviews').mockOnRatingSubmit;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockAddReview = require('../../app/api/reviews').addReview;
 
 describe('Rating Component', () => {

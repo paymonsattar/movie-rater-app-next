@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Movie, Review } from '../../app/types';
@@ -18,12 +18,7 @@ const MovieDetail = () => {
     return router.query?.id?.toString?.() ?? '';
   }, [router.query?.id]);
 
-  useEffect(() => {
-    fetchMovie();
-    fetchReviews();
-  }, [id]);
-
-  const fetchMovie = async () => {
+  const fetchMovie = useCallback(async () => {
     if (!id) {
       console.log(`error with ${id}`);
       return;
@@ -35,9 +30,9 @@ const MovieDetail = () => {
     } catch (err) {
       console.error(`Error fetching movie: ${id}`, err);
     }
-  };
+  }, [id]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     if (!id) {
       return;
     }
@@ -49,7 +44,12 @@ const MovieDetail = () => {
     } catch (err) {
       console.error(`Error fetching reviews: ${id}`, err);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchMovie();
+    fetchReviews();
+  }, [id, fetchMovie, fetchReviews]);
 
   const onRatingSubmit = async () => {
     fetchMovie();

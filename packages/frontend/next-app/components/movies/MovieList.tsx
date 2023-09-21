@@ -3,9 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   AppDispatch,
   RootState,
-  setSelectedGenres,
-  setReviewRatingRange,
-  searchMovies,
 } from '../../app/store';
 import { fetchAllMovies } from '../../app/store';
 import MovieCard from './MovieCard';
